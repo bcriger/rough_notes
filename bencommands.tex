@@ -1,0 +1,86 @@
+\usepackage{amsmath}
+\usepackage{bbold}
+\usepackage{color}
+\usepackage{stmaryrd}
+\usepackage{calc}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{xspace}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\providecommand{\polygon}[2]{%
+  let \n{len} = {2*#2*tan(360/(2*#1))} in
+ ++(0,-#2) ++(\n{len}/2,0) \foreach \x in {1,...,#1} { -- ++(\x*360/#1:\n{len})}}
+
+\DeclareMathOperator\erf{erf}
+\DeclareMathOperator\erfc{erfc}
+
+\newsavebox\CBox
+\newcommand\hcancel[2][0.5pt]{%
+  \ifmmode\sbox\CBox{$#2$}\else\sbox\CBox{#2}\fi%
+  \makebox[0pt][l]{\usebox\CBox}%  
+  \rule[0.5\ht\CBox-#1/2]{\wd\CBox}{#1}}
+
+\providecommand{\drv}[1]{\dfrac{\partial }{\partial #1}}
+\providecommand{\drf}[2]{\dfrac{\partial #1}{\partial #2}}
+\providecommand{\ddrf}[3]{\dfrac{\partial^2 #1}{\partial #2 \partial #3}}
+
+\providecommand{\tr}{\mathrm{tr}}
+ 
+\providecommand{\ket}[1]{\left \vert #1 \right \rangle}
+\providecommand{\bra}[1]{\left \langle #1 \right \vert}
+\providecommand{\braket}[2]{\left \langle #1 \left \vert #2 \right. \right \rangle}
+\providecommand{\angles}[1]{\left \langle #1 \right \rangle}
+\providecommand{\elem}[3]{\left \langle #1 \left \vert \vphantom{#1#2#3} #2 \right \vert #3 \right \rangle}
+\providecommand{\delem}[2]{\left \langle #1 \left \vert \vphantom{#1#2} #2 \right \vert #1 \right \rangle}
+\providecommand{\ketbra}[2]{\ket{#1} \! \bra{#2}}
+\providecommand{\proj}[1]{\ketbra{#1}{#1}}
+\providecommand{\twonorm}[1]{\| #1 \|_2}
+\providecommand{\abs}[1]{\left \vert #1 \right \vert}
+\providecommand{\set}[1]{\left \lbrace #1 \right \rbrace}
+\providecommand{\group}[1]{\left \langle #1 \right \rangle}
+\providecommand{\red}[1]{\textcolor[rgb]{0.5,0,0}{#1}}
+\providecommand{\blue}[1]{\textcolor[rgb]{0,0,0.5}{#1}}
+\providecommand{\green}[1]{\textcolor[rgb]{0,0.5,0}{#1}}
+\providecommand{\conjecture}[1]{\red{#1 (check this).}}
+\providecommand{\future}[1]{\green{#1 (do this later).}}
+\providecommand{\id}{\hat{\mathbb{1}}}
+\providecommand{\com}[2]{\left[#1,\,#2 \right]}
+\providecommand{\acom}[2]{\left \lbrace #1,\,#2 \right \rbrace}
+\providecommand{\diss}[2]{\mathcal{D}\left[ #1 \right]\left( #2 \right)}
+\providecommand{\meas}[2]{\mathcal{M}\left[ #1 \right]\left( #2 \right)}
+\providecommand{\lindtwo}[2]{ #1 #2 #1^{\dagger} - \dfrac{1}{2} \left \lbrace #1^{\dagger} #1,\,#2 \right \rbrace }
+\providecommand{\lindthree}[3]{ #1 #2 #3 - \dfrac{1}{2} \acom{#3 #1}{#2} }
+\providecommand{\lindfour}[4]{ #1 #2 #3 - \dfrac{1}{2} \acom{#4}{#2} }
+\providecommand{\meastwo}[2]{ #1 #2 + #2 #1^{\dagger} - \tr \left( #1 #2 + #2 #1^{\dagger} \right) #2 }
+\providecommand{\tenscom}[4]{\com{#1\otimes #2}{#3 \otimes #4}=\dfrac{1}{2}\left( \com{#1}{#3} \otimes \acom{#2}{#4} + \acom{#1}{#3} \otimes \com{#2}{#4} \right)}
+\providecommand{\tenscomsimple}[4]{\com{#1\otimes #2}{#3 \otimes #4} = #1 #3 \otimes \com{#2}{#4} + \com{#1}{#3} \otimes  #4 #2}
+\providecommand{\tensacom}[4]{\acom{#1\otimes #2}{#3 \otimes #4}=\dfrac{1}{2}\left( \com{#1}{#3} \otimes \com{#2}{#4} + \acom{#1}{#3} \otimes \acom{#2}{#4} \right)}
+\providecommand{\trace}[1]{\mathrm{tr} \left( #1 \right)}
+\providecommand{\comp}{\mathop{\bigcirc}}
+\providecommand{\swap}{\textsc{swap}\xspace}
+\providecommand{\cnot}{\textsc{cnot}\xspace}
+\providecommand{\col}{\textrm{col}}
+\providecommand{\qec}[3]{\llbracket #1,\,#2,\,#3 \rrbracket}
+\providecommand{\set}[1]{\left \lbrace #1 \right \rbrace}
+\renewcommand{\Im}{\textrm{Im}}
+\renewcommand{\Re}{\textrm{Re}}
+\providecommand{\lind}{\mathcal{L}}
+\providecommand{\norm}[2]{\left \vert \left \vert #2 \right \vert \right \vert_{#1}}
+\providecommand{\supp}[1]{\mathrm{supp}\left( #1 \right)}
+\providecommand{\given}{\, \middle \vert \,}
+\providecommand{\suchthat}{\, \middle \vert \,}
+\providecommand{\diag}[1]{\mathrm{diag}\left( #1 \right)}
+\providecommand{\ct}{^{\dagger}}
+
+\providecommand{\norm}[1]{\left\Vert #1 \right\Vert} %only works with amsmath
+
+\providecommand{\ncrit}{$n_{\textrm{crit}}$\xspace}
+
+\makeatletter
+\providecommand{\pr}[2]{p\left(#1\,\middle|\,#2\right)}
+\newcommand{\pushright}[1]{\ifmeasuring@#1\else\omit\hfill$\displaystyle#1$\fi\ignorespaces}
+\newcommand{\pushleft}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\hfill\fi\ignorespaces}
+\makeatother
