@@ -1,0 +1,135 @@
+% ##OpenQuantumSystems
+\documentclass[10pt,a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{Effect of Decoherence During Gates}
+\author{Ben Criger}
+\date{\today}
+\input{Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+
+\providecommand{\cnot}{\textsc{cnot}}
+
+\usetikzlibrary{decorations.pathreplacing,decorations.pathmorphing}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+The purpose of this note is to determine the effect of biased (read: mostly dephasing) noise during the operation of certain gates.
+I'm going to start with the $Y_{90}$ gate, implemented by a nice square pulse. 
+There are two limits that can be handled succinctly, the perfectly-Markovian limit (where we can't decrease the error rate without a quantum error-correcting code), and the `unknown constant Hamiltonian' limit, where we can apply pulse sequences, reversing the effect of the unknown Hamiltonian for $\sim \nicefrac{1}{2}$ the pulse duration.
+I begin with the Markovian limit, as I'm not so familiar with DD pulse sequences.
+\section{Helpful Math}
+Let's vectorize the density matrix, in the Pauli basis:
+\begin{equation}
+\rho = \frac{\id}{2} + \rho_x \sigma_x + \rho_y \sigma_y + \rho_z \sigma_z 
+\end{equation}
+To express the equation of motion in this basis, I calculate a few commutators and dissipators. 
+\begin{flalign}
+&\diss{A}{B} = \lindtwo{A}{B} \\
+% &\diss{\id}{B} = \lindtwo{\id}{B} = 0 \\
+&\diss{A}{\id} = \lindtwo{A}{\id} = \com{A}{A\ct}\\
+&\therefore 
+% &\diss{\sigma_+}{\id} = \com{\sigma_+}{\sigma_-} = -\sigma_z \quad \diss{\sigma_-}{\id} = \com{\sigma_-}{\sigma_+} = \sigma_z \quad
+\diss{\sigma_z}{\id} = \com{\sigma_z}{\sigma_z} = 0 \\
+&\diss{\sigma_z}{\sigma_z} = 0\\
+&\diss{\sigma_z}{\sigma_{x,y}} = -2\sigma_{x,y}\\
+% & \diss{\sigma_-}{\sigma_{x,y,z}} = \lindthree{\ketbra{0}{1}}{\sigma_{x,y,z}}{\ketbra{1}{0}}\\
+% & \diss{\sigma_-}{\sigma_{x,y}} = -\dfrac{1}{2}\sigma_{x,y}\\
+% &\diss{\sigma_-}{\sigma_z} = -\sigma_z \\ 
+&\com{\sigma_y}{\sigma_x} = -2i\sigma_z \quad \com{\sigma_y}{\sigma_z} = 2i\sigma_x 
+\end{flalign}
+With these in hand, we can start expressing the equation of motion for a noisy $Y_{90}$ in this operator basis. 
+\section{$Y_{90}$ with Markovian Noise}
+A simple master equation for a $Y_{90}$, subject to dephasing is:
+\begin{equation}
+\dot{\rho} = -i\frac{\omega}{2} \com{\sigma_y}{\rho} + \frac{\gamma}{2} \diss{\sigma_z}{\rho},
+\end{equation}
+where the factors of two are included to make the matrix description look nice, as we will see in a minute. 
+I express the commutator and dissipator in matrix form:
+\begin{alignat}{2}
+\frac{\gamma}{2} \diss{\sigma_z}{\cdot} &= \begin{bmatrix}
+0 & 0 & 0 & 0 \\ 0 & -\gamma & 0 & 0 \\ 0 & 0 & -\gamma & 0 \\ 0 & 0 & 0 & 0
+\end{bmatrix}
+\quad 
+-i \frac{\omega}{2} \com{\sigma_y}{\cdot} &&= \begin{bmatrix}
+0 & 0 & 0 & 0 \\ 0 & 0 & 0 & \omega \\ 0 & 0 & 0 & 0 \\ 0 & -\omega & 0 & 0
+\end{bmatrix}.
+\end{alignat}
+The Lindbladian is just the sum of these two terms:
+\begin{equation}
+\dot{\vec{\rho}} = \begin{bmatrix}
+0 & 0 & 0 & 0 \\ 0 & -\gamma & 0 & \omega \\ 0 & 0 & -\gamma & 0 \\ 0 & -\omega & 0 & 0
+\end{bmatrix} \vec{\rho} = \hat{L} \vec{\rho}
+\end{equation}
+We take the matrix exponent $\exp(\hat{L} t)$ to get the superoperator $S$:
+\begin{equation}
+S = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & e^{-\frac{\gamma t}{2}}\left( \cosh(\nicefrac{\beta t}{2}) - \frac{\gamma}{\beta} \sinh(\nicefrac{\beta t}{2})\right) & 0 & -\frac{2 \omega}{\beta} e^{-\frac{\gamma t}{2}}\sinh(\nicefrac{\beta t}{2}) \\
+0 & 0 & e^{-\frac{\gamma t}{2}} & 0 \\
+0 & \frac{2 \omega}{\beta} e^{-\frac{\gamma t}{2}}\sinh(\nicefrac{\beta t}{2}) & 0 & e^{-\frac{\gamma t}{2}}\left( \cosh(\nicefrac{\beta t}{2}) + \frac{\gamma}{\beta} \sinh(\nicefrac{\beta t}{2})\right)
+\end{bmatrix}
+\end{equation}
+where $\beta = \sqrt{\gamma^2 - 4\omega^2}$.
+
+If $\omega$ is large, and $\gamma$ is small (as we hope will be the case in low-noise systems), then $\beta$ will be imaginary, and the hyperbolic functions will become regular trigonometric functions:
+\begin{flalign}
+\beta &\equiv i \nu \\
+\cosh \left(\frac{\beta t}{2} \right) & = \cos \left(\frac{\nu t}{2} \right)\\
+\frac{\sinh(\frac{\beta t}{2})}{\beta} & = \frac{\sin(\frac{\nu t}{2})}{\nu} \\
+S & \mapsto \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & e^{-\frac{\gamma t}{2}}\left( \cos(\nicefrac{\nu t}{2}) - \frac{\gamma}{\nu} \sin(\nicefrac{\nu t}{2})\right) & 0 & -\frac{2 \omega}{\nu} e^{-\frac{\gamma t}{2}}\sin(\nicefrac{\nu t}{2}) \\
+0 & 0 & e^{-\frac{\gamma t}{2}} & 0 \\
+0 & \frac{2 \omega}{\nu} e^{-\frac{\gamma t}{2}}\sin(\nicefrac{\nu t}{2}) & 0 & e^{-\frac{\gamma t}{2}}\left( \cos(\nicefrac{\nu t}{2}) + \frac{\gamma}{\nu} \sin(\nicefrac{\nu t}{2})\right)
+\end{bmatrix}
+\end{flalign}
+We have control over $t$, and we'd like to determine how to set it in order to obtain the maximum-fidelity $Y_{90}$. 
+To separate the noise from the gate we'd like to perform, we express the total superoperator as the product of a desired $Y_{90}$ superoperator and a noise operator:
+\begin{flalign}
+S &= S_{\textrm{Noise}}S_{\textrm{Id}}\\
+\therefore S_{\textrm{Noise}} &= S_{\textrm{Id}}^{-1} S \\
+S_{\textrm{Id}} &= \begin{bmatrix}
+1 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \\ 0 & -1 & 0 & 0 
+\end{bmatrix} \\ 
+\therefore S_{\textrm{Noise}} &= \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & \frac{2\omega}{\nu} \exp(-\frac{\gamma t}{2}) \sin(\frac{\nu t}{2}) & 0 & \exp(-\frac{\gamma t}{2}) \left( \frac{\gamma}{\nu} \sin(\frac{\nu t}{2}) -\cos (\frac{\nu t}{2})\right) \\
+0 & 0 & \exp(-\gamma t) & 0 \\
+0 & \exp(-\frac{\gamma t}{2}) \left( \frac{\gamma}{\nu} \sin(\frac{\nu t}{2}) + \cos (\frac{\nu t}{2})\right) & 0 & \frac{2\omega}{\nu} \exp(-\frac{\gamma t}{2}) \sin(\frac{\nu t}{2})
+\end{bmatrix} 
+\end{flalign}
+To find the channel fidelity $F_{\Lambda} = \elem{\Omega}{\Lambda \otimes \id \left( \proj{\Omega} \right)}{\Omega}$ (where $\ket{\Omega}$ is a Bell state), we take the trace of this superoperator and divide by 4 (I won't prove this here, but leave it as an exercise):
+\begin{equation}
+F_{S_{\textrm{Noise}}} = \frac{1}{4} \left[ 1 + \frac{4\omega}{\nu} \exp\left(-\frac{\gamma t}{2}\right) \sin\left(\frac{\nu t}{2}\right) + \exp\left(-\gamma t\right) \right]
+\end{equation}
+To find out how long to leave the Hamiltonian on, we optimize this fidelity over $t$:
+\section{Questions}
+\begin{enumerate}
+\item Show that ``shorting'' the gate time optimally (maximizing the channel fidelity) doesn't appreciably raise the fidelity over just setting $\omega t = \frac{\pi}{2}$.
+\item How does all this change when we add amplitude damping? 
+\end{enumerate}
+
+\end{document}
