@@ -125,10 +125,41 @@ To find the channel fidelity $F_{\Lambda} = \elem{\Omega}{\Lambda \otimes \id \l
 \begin{equation}
 F_{S_{\textrm{Noise}}} = \frac{1}{4} \left[ 1 + \frac{4\omega}{\nu} \exp\left(-\frac{\gamma t}{2}\right) \sin\left(\frac{\nu t}{2}\right) + \exp\left(-\gamma t\right) \right]
 \end{equation}
-To find out how long to leave the Hamiltonian on, we optimize this fidelity over $t$:
+To find out how long to leave the Hamiltonian on, we try to optimize this fidelity over $t$:
+\begin{flalign}
+\dfrac{dF_{S_{\textrm{Noise}}}}{dt} &= \frac{1}{2} \, \omega \cos\left(\frac{1}{2} \, \nu t\right) e^{\left(-\frac{1}{2} \, \gamma t\right)} - \frac{\gamma \omega e^{\left(-\frac{1}{2} \, \gamma t\right)} \sin\left(\frac{1}{2} \, \nu t\right)}{2 \, \nu} - \frac{1}{4} \, \gamma e^{\left(-\gamma t\right)} = 0 \\ 
+\therefore \sin\left(\frac{1}{2} \, \nu t\right) &= \frac{{\left(2 \, \nu \omega \cos\left(\frac{1}{2} \, \nu t\right) e^{\left(\gamma t\right)} - \gamma \nu e^{\left(\frac{1}{2} \, \gamma t\right)}\right)} e^{\left(-\gamma t\right)}}{2 \, \gamma \omega}
+\end{flalign}
+This formula is not analytically soluble, so we just set $t=\frac{\pi}{\nu}$, to get the following (ridiculously good-looking) superoperator:
+\begin{flalign}
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & -\frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} & 0 & \frac{2 \, \omega e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} \\
+0 & 0 & e^{\left(-\frac{\pi \gamma}{\nu}\right)} & 0 \\
+0 & -\frac{2 \, \omega e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} & 0 & \frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu}.
+\end{bmatrix}
+\end{flalign}
+We subtract off a term $2\frac{\omega}{\nu}\exp\left( -\frac{\pi \gamma}{2 \nu} \right) Y_{90}$ to obtain the remaining diagonal part of the superoperator:
+\begin{flalign}
+\begin{bmatrix}
+-\frac{2 \, \omega e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} + 1 & 0 & 0 & 0 \\
+0 & -\frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} & 0 & 0 \\
+0 & 0 & -\frac{2 \, \omega e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} + e^{\left(-\frac{\pi \gamma}{\nu}\right)} & 0 \\
+0 & 0 & 0 & \frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu}
+\end{bmatrix}
+\end{flalign}
+This is equivalent to a Pauli map with the following probabilities:
+\begin{flalign}
+&p_I = -\frac{\omega e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} + \frac{1}{4} \, e^{\left(-\frac{\pi \gamma}{\nu}\right)} + \frac{1}{4} \quad
+p_X = -\frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{2 \, \nu} - \frac{1}{4} \, e^{\left(-\frac{\pi \gamma}{\nu}\right)} + \frac{1}{4} \nonumber \\
+&p_Y = -\frac{\omega e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{\nu} + \frac{1}{4} \, e^{\left(-\frac{\pi \gamma}{\nu}\right)} + \frac{1}{4} \quad
+p_Z = \frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{2 \, \nu} - \frac{1}{4} \, e^{\left(-\frac{\pi \gamma}{\nu}\right)} + \frac{1}{4} 
+\end{flalign}
+These probabilities approach $0$ in the small $\gamma$ limit and approach $\frac{1}{4}$ in the large $\gamma$ limit. 
+I'm willing to bet that they are always between $0$ and $1$.
 \section{Questions}
 \begin{enumerate}
-\item Show that ``shorting'' the gate time optimally (maximizing the channel fidelity) doesn't appreciably raise the fidelity over just setting $\omega t = \frac{\pi}{2}$.
+\item Show that ``shorting'' the gate time optimally (maximizing the channel fidelity) doesn't appreciably raise the fidelity over just setting $\omega t = \frac{\pi}{\nu}$.
 \item How does all this change when we add amplitude damping? 
 \end{enumerate}
 
