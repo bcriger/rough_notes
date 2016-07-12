@@ -36,10 +36,39 @@
 \begin{document}
 \maketitle
 \section{Introduction}
-The purpose of this note is to determine the 
+The purpose of this note is to determine the utility of single-qubit magic states for performing multi-qubit operations.
+All this may already be known, but I'm not looking it up, for whatever reason. 
+I start with a review of single-qubit gate teleportation, then try to phrase this protocol as a joint measurement protocol.
+I conclude (I hope) by generalising this protocol to multi-qubit measurements. 
+\section{Review}
+Here's the well-known protocol for implementing a $T$ gate using Clifford operations and state preparation:
+\begin{figure}[!h]
+\centering
+\input{GateTeleportation.tikz}
+\end{figure}
+\FloatBarrier
+To show that this circuit does what it's supposed to, we can do a little math:
+\begin{flalign}
+\ket{\psi_{\mathrm{init}}} &= \left( \ket{0} + \exp \left( \frac{i\pi}{4} \right) \ket{1} \right) \otimes \left( \alpha \ket{0} + \beta \ket{1} \right) = \alpha \ket{00} + \beta \ket{01} + \alpha \exp\left( \frac{i\pi}{4} \right) \ket{10} + \beta \exp\left( \frac{i\pi}{4} \right) \ket{11} \\
+\mathrm{CNOT}\ket{\psi_{\mathrm{init}}} &= \alpha \ket{00} + \beta \ket{01} + \alpha \exp\left( \frac{i\pi}{4} \right) \ket{11} + \beta \exp\left( \frac{i\pi}{4} \right) \ket{10} \nonumber \\
+&= \left(\alpha \ket{0} + \beta \exp \left( \frac{i\pi}{4} \right)  \right) \otimes \ket{0} + \left( \alpha \exp \left( \frac{i\pi}{4} \right) \ket{1} + \beta \ket{0}\right) \otimes \ket{1} \\
+&= \left(\alpha \ket{0} + \beta \exp \left( \frac{i\pi}{4} \right)  \right) \otimes \ket{0} + S^{-1}X\left(\exp \left( \frac{-i\pi}{4} \right)\alpha \ket{0} + \beta \ket{1}\right) \otimes \ket{1}
+\end{flalign}
+If we measure the bottom qubit, obtaining $0$ or $1$, the post-selected states are equivalent up to a global phase after applying the classically-controlled $XS$. 
+
+%Bad writing:
+To try to generalise this protocol, it might be useful to phrase it in terms of joint Pauli measurements.
+\section{Joint Measurement Protocol}
+If we propagate the measured operator $Z_1$ back through the \cnot, we get a joint $Z_0Z_1$. 
+Measuring this operator projects either into the space spanned by $\set{\ket{00},\, \ket{11}}$ or $\set{\ket{01},\, \ket{10}}$. 
+At this point, we could do the classically-controlled Clifford before we do the \cnot, but it's tough to see the general principle at work. 
+
+Though, maybe you could disentangle by measuring an $X$ or something.
+\section{Multi-Qubit Measurement}
 \section{Questions}
 \begin{enumerate}
-\item  
+\item Taking a look at Daniel Gottesman's thesis, near equation 5.23, it looks like there's a state that can be prepared from post-selected joint Pauli measurement that facilitates a Toffoli gate. It would be interesting to see if this can be extended to other fixed-parity multi-qubit states, and what the resource count looks like. 
+\item Can you get a $T$ gate from a Toffoli gate? I remember there being some conversion in Nielsen/Chuang, but it was between the Toffoli gate and some other fancy angle. 
 \end{enumerate}
 
 \end{document}
