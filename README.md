@@ -12,8 +12,11 @@ These notes may be untested, and may have errors.
 They might also contain problems solved elsewhere using better methods. 
 
 ## Double Hashtags
-Instead of putting these notes in subfolders, I'll include little tags in the source which are searchable.
+Instead of putting these notes in subfolders, I'll include little CamelCase tags in the source which are searchable.
 The format of these tags is `##SubjectName`, a (probably partial) list follows:
 
  + `##OpenQuantumSystems` 
  + `##Solved` for notes which are mainly complete (there may be some open questions at the end, but the main body contains a result)
+ + `##FaultTolerantOperations`
+ + `##MagicStates`
+ + `##Teleportation`
