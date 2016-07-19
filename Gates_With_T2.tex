@@ -157,6 +157,26 @@ p_Z = \frac{\gamma e^{\left(-\frac{\pi \gamma}{2 \, \nu}\right)}}{2 \, \nu} - \f
 \end{flalign}
 These probabilities approach $0$ in the small $\gamma$ limit and approach $\frac{1}{4}$ in the large $\gamma$ limit. 
 I'm willing to bet that they are always between $0$ and $1$.
+\section{Amplitude Damping}
+We'd also like, if possible, to consider the effect of amplitude damping (or $T_1$ noise) on the $Y_{90}$ gate. 
+It will likely not be possible to express this noise as a mixed-Clifford channel, given that it is non-unital.
+There are two approaches to coping with this; either we obtain a mixed-Clifford channel which optimally approximates the gate, or we fold the noisy $Y_{90}$ into the nearest state-preparation or measurement location, modeling the effect of $T_1$ on a mixture of $\proj{0}$ and $\proj{1}$ rather than superpositions. 
+This second approach ought to be easier (analytically soluble, rather than requiring an SDP), and apply most of the time (since syndrome extraction from a CSS code usually only uses $H$/$Y_{90}$ gates to prepare superposition states and rotate measurement bases), so I'll try that first. 
+
+We calculate the effect of a $\sigma_-$ dissipator in the Pauli basis:
+\begin{flalign}
+\diss{\sigma_-}{\id} &= \com{\sigma_-}{\sigma_+} = \sigma_z \\ 
+\diss{\sigma_-}{\sigma_x} &= \lindthree{\sigma_-}{\sigma_x}{\sigma_+} = \ketbra{0}{1} \sigma_x \ketbra{1}{0} - \dfrac{1}{2} \acom{\proj{1}}{\sigma_x} = -\dfrac{1}{2} \sigma_x \\
+\diss{\sigma_-}{\sigma_y} &= -\dfrac{1}{2}\sigma_y \\ 
+\diss{\sigma_-}{\sigma_z} &= \ketbra{0}{1} \sigma_z \ketbra{1}{0} - \dfrac{1}{2} \acom{\proj{1}}{\sigma_z} = - \sigma_z
+\end{flalign}
+This allows us to express the new Lindbladian in matrix form (note that I mess with coefficient definitions to try to get the matrix to look nice, your coefficients may vary):
+\begin{flalign}
+\dot{\rho} &= -i\frac{\omega}{2} \com{\sigma_y}{\rho} + \frac{\gamma_{\phi}}{2} \diss{\sigma_z}{\rho} + \gamma_{-} \diss{\sigma_-}{\rho} \\ 
+\dot{\vec{\rho}} &= \begin{bmatrix}
+0 & 0 & 0 & -\gamma_{-} \\ 0 & -\gamma_{\phi} - \frac{1}{2}\gamma_{-} & 0 & \omega \\ 0 & 0 & -\gamma_{\phi}-\frac{1}{2}\gamma_{-} & 0 \\ \gamma_{-} & -\omega & 0 & 0
+\end{bmatrix} \vec{\rho} = \hat{L} \vec{\rho}
+\end{flalign}
 \section{Questions}
 \begin{enumerate}
 \item Show that ``shorting'' the gate time optimally (maximizing the channel fidelity) doesn't appreciably raise the fidelity over just setting $\omega t = \frac{\pi}{\nu}$.
