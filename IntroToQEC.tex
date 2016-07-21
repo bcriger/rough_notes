@@ -1,0 +1,65 @@
+% ##OpenQuantumSystems
+\documentclass[10pt,a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{Intro to Quantum Error Correction}
+\author{Ben Criger}
+\date{\today}
+\input{Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+
+\providecommand{\cnot}{\textsc{cnot}}
+
+\usetikzlibrary{decorations.pathreplacing,decorations.pathmorphing}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+The purpose of this note is to help introduce quantum error correction [QEC] and (especially) fault-tolerance to people who are not familiar with quantum mechanics, or quantum computing, such as:
+\begin{itemize}
+\item undergraduates,
+\item electrical/computer/software engineers,
+\item experimental physicists now trying to implement QEC, who have missed such an introduction.
+\end{itemize}
+My goals in writing this note are:
+\begin{itemize}
+\item to keep it short, at the cost of completeness,
+\item to refer to longer/superior works where possible (often),
+\item to frequently compare ``scary quantum'' processes with their classical equivalents, to help de-mystify QEC.
+\end{itemize}
+[Insert usual caveat about imprecise notation, i.e.: these notes are free, and you get what you pay for.]
+
+I begin in the following section with an explanation of why error correction is necessary, moving on to describe the difference between error-correction and fault-tolerance, before moving on to the most popular elements of QEC theory (stabilizer codes $\mapsto$ CSS codes $\mapsto$ homological codes $\mapsto$ the surface code). 
+\section{Why Error Correction?}
+If you meet a software engineer in the street, the need for error correction may not be obvious. 
+In the life of a computer programmer, errors are things caused exclusively by people, and careful thinking and good practices are required to prevent, detect and correct them. 
+[Maybe there's a repetition code at work here, especially with \texttt{diff}, but that is an analogy for another day.]
+\subsection{Fault Tolerance}
+
+\section{The Stabilizer Formalism in a Nutshell}
+\subsection{CSS codes}
+\subsection{Homological Codes}
+\subsection{The Surface Code}
+
+\end{document}
