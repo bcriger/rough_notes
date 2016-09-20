@@ -1,0 +1,7 @@
+SCALE 2
+
+0 W {\ket{\psi}} {U\ket{\psi}}
+1 W {\ket{A_{+1}}}
+
+0 1 G $\mathcal{M}_{BC}$
+1 G $\mathcal{M}_{D}$

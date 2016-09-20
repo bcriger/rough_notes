@@ -1,0 +1,171 @@
+% ##QuantumErrorCorrection ##LatticeSurgery
+\documentclass[a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{Quantum Fault Tolerance}
+\subtitle{One-Qubit Cliffords by Measurement}
+\author{Ben Criger}
+\date{\today}
+\input{Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+
+\providecommand{\cnot}{\textsc{cnot}}
+
+\usetikzlibrary{decorations.pathreplacing, decorations.pathmorphing, shapes.geometric, calc}
+
+\providecommand{\protocol}[4]{
+\begin{tikzpicture}[xscale=2.500000,yscale=2.0,x=1pt,y=1pt]
+\filldraw[color=white] (0.000000, -7.500000) rectangle (48.000000, 22.500000);
+% Drawing wires
+% Line 3: 0 W {\ket{\psi}} {U\ket{\psi}}
+\draw[color=black] (0.000000,15.000000) -- (48.000000,15.000000);
+\draw[color=black] (0.000000,15.000000) node[left] {${\ket{\psi}}$};
+% Line 4: 1 W {\ket{A_{+1}}}
+\draw[color=black] (0.000000,0.000000) -- (48.000000,0.000000);
+\draw[color=black] (0.000000,0.000000) node[left] {${\ket{#1_{+1}}}$};
+% Done with wires; drawing gates
+% Line 6: 0 1 G $M_{BC}$
+\draw (12.000000,15.000000) -- (12.000000,0.000000);
+\begin{scope}
+\draw[fill=white] (12.000000, 7.500000) +(-45.000000:8.485281pt and 19.091883pt) -- +(45.000000:8.485281pt and 19.091883pt) -- +(135.000000:8.485281pt and 19.091883pt) -- +(225.000000:8.485281pt and 19.091883pt) -- cycle;
+\clip (12.000000, 7.500000) +(-45.000000:8.485281pt and 19.091883pt) -- +(45.000000:8.485281pt and 19.091883pt) -- +(135.000000:8.485281pt and 19.091883pt) -- +(225.000000:8.485281pt and 19.091883pt) -- cycle;
+\draw (12.000000, 7.500000) node {$\mathcal{M}_{#2#3}$};
+\end{scope}
+% Line 7: 1 G $M_{D}$
+\begin{scope}
+\draw[fill=white] (36.000000, -0.000000) +(-45.000000:8.485281pt and 8.485281pt) -- +(45.000000:8.485281pt and 8.485281pt) -- +(135.000000:8.485281pt and 8.485281pt) -- +(225.000000:8.485281pt and 8.485281pt) -- cycle;
+\clip (36.000000, -0.000000) +(-45.000000:8.485281pt and 8.485281pt) -- +(45.000000:8.485281pt and 8.485281pt) -- +(135.000000:8.485281pt and 8.485281pt) -- +(225.000000:8.485281pt and 8.485281pt) -- cycle;
+\draw (36.000000, -0.000000) node {$\mathcal{M}_{#4}$};
+\end{scope}
+\draw[color=black] (48.000000,15.000000) node[right] {${U\ket{\psi}}$};
+\end{tikzpicture}
+}
+
+\providecommand{\protblob}[9]{
+\begin{figure}[!ht]
+\centering
+\protocol{#1}{#2}{#3}{#4}
+\end{figure}
+\FloatBarrier
+\begin{equation}
+\begin{array}{c}
+S_{\textrm{init}} \\ 
+\hline
+\overline{X}\\
+\overline{Z}
+\end{array} = 
+\begin{array}{c}
+I#1\\
+\hline
+XI\\
+ZI
+\end{array}
+\overset{\mathcal{M}_{#2#3}}{\longmapsto}
+\begin{array}{c}
+#2#3\\
+\hline
+#5\\
+#6
+\end{array}
+\overset{\mathcal{M}_{I#4}}{\longmapsto}
+\begin{array}{c}
+I#4\\
+\hline
+#7\\
+#8
+\end{array} \therefore U \sim #9
+\end{equation}
+}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+Some fault tolerant codes don't have transversal Clifford gates, which necessitates code deformation. 
+Sometimes (like in Bravyi's 2016 QIP tutorial) these codes have weird symmetric boundary conditions that I don't understand. 
+I'd like to compare this to a more intuitive non-unitary implementation of Cliffords, regular old lattice surgery. 
+To accomplish this, I need to check which gates can be obtained by a protocol where:
+\begin{enumerate}
+\item An ancilla is prepared in a Pauli $+1$ eigenstate
+\item a two-bit joint measurement is performed, and
+\item the original ancilla qubit is measured out fault-tolerantly.
+\end{enumerate}
+To be non-trivial, the jointly-measured Pauli has to anticommute with the prepared Pauli and the measured Pauli, there are 36 such protocols.
+However, consider the case in which $A=D$. In this case, the tableau evolves as follows:
+\begin{equation*}
+\begin{array}{c}
+S_{\textrm{init}} \\ 
+\hline
+\overline{X}\\
+\overline{Z}
+\end{array} = 
+\begin{array}{c}
+IA\\
+\hline
+XI\\
+ZI
+\end{array}
+\overset{\mathcal{M}_{BC}}{\longmapsto}
+\begin{array}{c}
+BC\\
+\hline
+XI(XA)\\
+ZI(ZA)
+\end{array}
+\overset{\mathcal{M}_{IA}}{\longmapsto}
+\begin{array}{c}
+IA\\
+\hline
+XI\\
+ZI
+\end{array},
+\end{equation*}
+where either of the Paulis in brackets may be present without affecting the result. 
+Either way, the resulting unitary is the identity, we eliminate these cases, leaving 18 remaining.
+I test all of them in the remainder of this document, assuming all measurements produce $+1$ outcomes throughout: 
+\begin{figure}[!ht]
+\centering
+\protocol{A}{B}{C}{D}
+\caption{The basic protocol I want to analyse, with a $+1$ eigenstate prepared on the ancilla, a joint measurement of a two-qubit Pauli $BC$, and a final measurement of Pauli $D$. }
+\end{figure}
+
+Below, I present the 18 protocols, with a little equation explaining what happens to the stabiliser and logicals throughout:
+\protblob{X}{X}{Y}{Z}{XI}{ZX}{XI}{YI}{HPH}%1
+\protblob{X}{X}{Z}{Y}{XI}{ZX}{XI}{YI}{HPH}%2
+\protblob{X}{Y}{Y}{Z}{XX}{ZX}{ZI}{XI}{H}%3
+\protblob{X}{Y}{Z}{Y}{XX}{ZX}{ZI}{XI}{H}%4
+\protblob{X}{Z}{Y}{Z}{XX}{ZI}{YI}{ZI}{P}%5
+\protblob{X}{Z}{Z}{Y}{XX}{ZI}{YI}{ZI}{P}%6
+\protblob{Y}{Y}{Z}{X}{XY}{ZY}{ZI}{XI}{H}%7
+\protblob{Y}{Y}{X}{Z}{XY}{ZY}{ZI}{XI}{H}%8
+\protblob{Y}{Z}{Z}{X}{XY}{ZI}{YI}{ZI}{P}%9
+\protblob{Y}{Z}{X}{Z}{XY}{ZI}{YI}{ZI}{P}%10
+\protblob{Y}{X}{Z}{X}{XI}{ZY}{XI}{YI}{HPH}%11
+\protblob{Y}{X}{X}{Z}{XI}{ZY}{XI}{YI}{HPH}%12
+\protblob{Z}{Z}{X}{Y}{XZ}{ZI}{YI}{ZI}{P}%13
+\protblob{Z}{Z}{Y}{X}{XZ}{ZI}{YI}{ZI}{P}%14
+\protblob{Z}{X}{X}{Y}{XI}{ZZ}{XI}{YI}{HPH}%15
+\protblob{Z}{X}{Y}{X}{XI}{ZZ}{XI}{YI}{HPH}%16
+\protblob{Z}{Y}{X}{Y}{XZ}{ZZ}{ZI}{XI}{H}%17
+\protblob{Z}{Y}{Y}{X}{XZ}{ZZ}{ZI}{XI}{H}%18
+\end{document}
