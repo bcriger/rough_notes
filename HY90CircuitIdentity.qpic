@@ -1,0 +1,24 @@
+DEPTHPAD 1
+SCALE 2
+a W 
+b W
+
+b H
+a b
+b H
+=
+b G $Y_{-90}$
+b Z
+a b
+b Z
+b G $Y_{90}$
+=
+b G $Y_{-90}$
+a b
+b Z
+b Z
+b G $Y_{90}$
+=
+b G $Y_{-90}$
+a b
+b G $Y_{90}$
