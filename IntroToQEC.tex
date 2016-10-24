@@ -30,6 +30,7 @@
 \setlength\figurewidth{12cm}
 
 \providecommand{\cnot}{\textsc{cnot}}
+\providecommand{\volts}{\, \textrm{V}}
 
 \usetikzlibrary{decorations.pathreplacing,decorations.pathmorphing}
 
@@ -58,22 +59,36 @@ In the life of a computer programmer, errors are things caused exclusively by pe
 However, if you scratch the surface, you find instances of error correction and even (what I'm going to call) fault-tolerance at work. 
 
 Take, for example, satellite/spacecraft communications. 
-These spacecraft are very far away, and bits don't make it between the spacecraft and the ground station. 
+These spacecraft are very far away, and there are bits that don't make it between the spacecraft and the ground station. 
 Actually, that example is too far outside our daily experience to take, so let's take flash drives, AKA USB keys.
 The job of these drives is to store bits ($0$'s and $1$'s), which they manage to do most of the time.
 However, one bit in every $10^{4\text{--}9}$ is randomly flipped, which in the worst case scenario would lead to an ASCII typo per page of text [or something].
 
-To compensate for this, the USB key records the information redundantly, using more bits than are stricly necessary.
+To compensate for this, the USB key records the information redundantly, using more bits than are strictly necessary.
 When reading, the CPU can then check that different decodings of the redundant information are consistent, and if they're not, can infer a decoding that's likely to be correct. 
 The fact that the CPU is not itself (assumed to be) error-prone is a great boon to us in reading USB keys, otherwise we couldn't trust that any decoding was correct. 
 
 There's a reason that CPUs are not considered noisy, by the way.
-Transistor-transistor logic (TTL for short) defines a standard voltage for its $0$ and $1$ states, usually $0\,\textrm{V}$ and  $5\,\textrm{V}$, respectively.
-These circuits can be designed to output $0\,\textrm{V}$ for any input voltage between $0\,\textrm{V}$ and $0.4\,\textrm{V}$, likewise to output $5\,\textrm{V}$ whenever a voltage of $2.6\,\textrm{V}$ or higher is input. 
+Transistor-transistor logic (TTL for short) defines a standard voltage for its $0$ and $1$ states, usually $0 \volts$ and  $5 \volts$, respectively.
+These circuits can be designed to output $0 \volts$ for any input voltage between $0 \volts$ and $0.4 \volts$, likewise to output $5 \volts$ whenever a voltage of $2.6 \volts$ or higher is input. 
 This is a (very powerful) error correction mechanism. 
 If noise spreads voltages out according to some unimodal distribution, we can tighten that distribution at every TTL element, paying only a small energy cost to do so. 
 In theory, we could also design an element which outputs a third value whenever the input voltage doesn't correspond to a logical $0$ or $1$, so that we can detect errors. 
 In practice, we would just increase the supply voltage until we don't have to worry. 
+
+The availability of reliable components which can be used to store and process classical information is a great benefit to computer engineers.
+In the following sections, we'll see which of these properties can also be achieved for quantum systems. 
+But first, some definitions.
+\subsection{What is a Code?}
+A code is a subset. 
+
+If you have a system, classical quantum or other, which can assume states from some set, you can define any subset of these states to be a code.
+The states in the code are called the \emph{codewords}. 
+A code can be used to fulfil a variety of purposes.
+Compression, for example, involves codes whose codewords are shorter than the logical messages they represent.
+
+We will mostly concern ourselves with \emph{error-correcting} codes, which can only be analysed using two other mathematical objects as tools.
+The first of these is the \emph{error model}, the set of possible transformations which can act on a state (codeword or otherwise) without our knowledge. 
 \subsection{Fault Tolerance}
 We will aim to replicate this property of TTL logic for quantum states. 
 TTL logic takes a continuous set of values (voltages) and uses them to represent a discrete logical set (bits). 
