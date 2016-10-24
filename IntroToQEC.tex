@@ -83,29 +83,78 @@ But first, some definitions.
 A code is a subset. 
 
 If you have a system, classical quantum or other, which can assume states from some set, you can define any subset of these states to be a code.
-The states in the code are called the \emph{codewords}. 
+The states in the code are called the \emph{codewords}.
+
+Most of the time, we will also constrain our codes to be \emph{linear} with respect to some operation (usually denoted $+$), which means that for any codewords $a$ and $b$, $a + b$ is also a codeword. 
+This is pretty common, and it means we can normally consider state sets which are vector spaces, and codes which are subspaces. 
+This is true in both the classical and quantum case. 
+
 A code can be used to fulfil a variety of purposes.
 Compression, for example, involves codes whose codewords are shorter than the logical messages they represent.
 
 We will mostly concern ourselves with \emph{error-correcting} codes, which can only be analysed using two other mathematical objects as tools.
 The first of these is the \emph{error model}, the set of possible transformations which can act on a state (codeword or otherwise) without our knowledge. 
+The second is the \emph{recovery map}, which takes as input states from the full set and outputs corresponding codewords. 
+To solidify these ideas, let's consider an example.
+\subsubsection{Example: 3-Bit Repetition Code}
+Suppose Alice wants to tell Bob the value of a bit, $0$ or $1$, but that she has to use a channel which is subject to symmetric bit-flip:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[x=3cm, y=2cm]
+\node (in0) at (0, 1) {$0$};
+\node (in1) at (0, 0) {$1$};
+\node (out0) at (1, 1) {$0$};
+\node (out1) at (1, 0) {$1$};
+\draw [->] (in0.east) -- (out0.west) node [above,align=center,midway] {$1-p$};
+\draw [->] (in0.east) -- (out1.west) node [above,align=center,pos=0.35] {$p$};
+\draw [->] (in1.east) -- (out0.west) node [above,align=center,pos=0.65] {$p$};
+\draw [->] (in1.east) -- (out1.west) node [below,align=center,midway] {$1-p$};
+\end{tikzpicture}
+\caption{Graphical representation of an error map on a classical bit which flips the bit (taking $0$ to $1$ and vice versa) with probability $p$.}
+\end{figure}
+
+Alice, then, would like to send messages from $\mathbb{Z}_2$, so she should design codes that have two codewords. 
+Supposing that Alice has repeated access to the channel, and knows the probability $p$, she can design codes which use $\mathbb{Z}_2^n$ as the full state space. 
+A simple thing that Alice can do is repeat herself three times (taking $n=3$) to make herself understood.
+Bob, then, should infer that $0$ is the desired message when he receives a state containing mostly $0$s and $1$ when he receives a state containing mostly $1$s. 
+Let's express these ideas mathematically, so that we can generalize later.
+
+\begin{description}
+\item[Codewords]: $000$, $111$
+\item[Error Model]:
+\begin{equation}
+000 \mapsto \begin{array}{cl}
+000 & (1-p)^3 \\ 001,\, 010,\, 100 & p(1-p)^2 \\ 110,\, 101,\, 011 & p^2(1-p) \\ 111 & p^3
+\end{array} \quad 
+111 \mapsto \begin{array}{cl}
+111 & (1-p)^3 \\ 110,\, 101,\, 011 & p(1-p)^2 \\ 001,\, 010,\, 100 & p^2(1-p) \\ 000 & p^3
+\end{array}
+\end{equation} 
+\item[Recovery Map]: $(000,\,001,\,010,\,100) \mapsto 000$, $(111,\,110,\,101,\,011) \mapsto 111$
+\end{description}
+We can see that, if there is a weight-two or weight-three error, Bob will infer the incorrect state.
+The resulting probability of error is $3p^2(1-p) + p^3$. 
+
+\textbf{Exercise: } When does this protocol amplify errors? How should we remedy this?
+
+We will go on to construct quantum codes in later sections. 
+But first, I should confess something.
 \subsection{Fault Tolerance}
-We will aim to replicate this property of TTL logic for quantum states. 
-TTL logic takes a continuous set of values (voltages) and uses them to represent a discrete logical set (bits). 
-This trick has been replicated in QEC, in `qubit-in-oscillator' codes. 
-While these codes appear simple, and perhaps useful, they're not very popular, so we're going to take large sets of qubits as our input space.
+Let's begin with an overall reminder of what we're trying to accomplish.
+We want to replicate the properties of TTL logic for quantum states and operations.
+Not only are we able to interpret the output of a TTL gate using a perfect computer, we also know that TTL operations suppress errors that occur \emph{during the operations themselves}. 
+We therefore have to \emph{encode operations} in some way, using a small subset of operations drawn from some large set to ensure that errors from the operations used to correct the code can themselves be corrected. 
+For the first few examples, we won't focus on this, since it's useful to see that we can correct `vanilla' errors before moving on to attempt fault tolerance.
 
-If we want to change the input space, we should have a general idea of how error correction works, so that we can determine which codes work, and how well. 
-Let's define a code to be [blah blah blah, n, k, d]. 
+\section{Quantum Codes}
+If fault tolerance wasn't a big enough problem, we have another one. 
+Error models for quantum systems are much more complex than those for classical bits, because they're \emph{continuous}. They don't map $\ket{\psi}$ to $\ket{\psi_{\perp}}$, but instead to $U\ket{\psi}$ for $U$ some unknown unitary, for example.
+There are even some channels for which no mixture of unitaries can describe the channel's effects. 
 
-[Small voltage shifts = correctable errors, large voltage shifts = uncorrectable, even larger voltage shifts = undetectable]
-
-[Knill-Laflamme]
-
-This leaves us with a bit of a problem. 
-Qubit quantum states are represented by complex length-2 vectors with unit norm. 
-However, in order to represent an arbitrary state of two qubits, we need to use tensor products (AKA Kronecker products for our purposes) of these vectors, and the tensor product of an length-$a$ vector and a length-$b$ vector has length $a \times b$. For 2-3 qubits, analytic results can still (sometimes) be obtained, but calculations involving these vectors don't stay doable after that. 
-We'll need to find a family of $n$-qubit quantum states that can be efficiently represented (i.e. adding a qubit doesn't multiply the size of the vector, or other object we have to keep in memory).
+At first glance, this looks similar to the central problem of analog computing, that it's far easier to force an input from a continuous space to a few discrete values (oh, say, $0 \volts$ and $5 \volts$) than it is to force noisy values to stay close to the value that some arbitrary computation should be at ($x \volts$). 
+For this reason, people with experience in analog computing are wary of quantum computing when they hear about it. 
+All is not lost, though. 
+There's a famous result 
 \section{The Stabilizer Formalism in a Nutshell}
 There is at least one well-studied way to do this (there are a few others as well, but they're not as popular).
 This theory uses operators instead of quantum states as its representation, because tensor-product operators can give rise to states with non-trivial entanglement, which it turns out is necessary to do error correction [Prove this?].
