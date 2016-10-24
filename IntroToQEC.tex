@@ -188,12 +188,32 @@ c^\ast - p (c^\ast - c) & 1 - p - q + 2pq
 \end{flalign}
 \textbf{Exercise: } Sub in the $\ket{0}$ and $\ket{1}$ states. What happens to them?
 
-At first glance, this looks similar to the central problem of analog computing, that it's far easier to force an input from a continuous space to a few discrete values (oh, say, $0 \volts$ and $5 \volts$) than it is to force noisy values to stay close to the value that some arbitrary computation should be at ($x \volts$). 
+If we allow generic operations, this looks similar to the central problem of analog computing, that it's far easier to force an input from a continuous space to a few discrete values (oh, say, $0 \volts$ and $5 \volts$) than it is to force noisy values to stay close to the value that some arbitrary computation should be at ($x \volts$). 
 For this reason, people with experience in analog computing are wary of quantum computing when they hear about it. 
 All is not lost, though. 
 In the next subsection, we'll see that these analog errors can be \emph{digitized}, but first, we have to define what it means to correct an error in the quantum case.
 \subsection{The Knill-Laflamme Criterion and Noise Digitization}
+To talk about which quantum errors can be corrected, we should first make clear that in the typical case, not all of them can be corrected. 
+To see this, consider the quantum bit-flip map defined above, and its action on the quantum bit-flip code $\ket{000},\,\ket{111}$.
+With probability $p^3$, the channel maps one logical state directly to the other. 
+Any sane recovery map would include $\ket{111} \mapsto \ket{111}$, so that there's always some probability of error. 
+However, we can always try to take a subset of the operators $E_j$ and declare it to be exactly correctable. 
+If our codewords are labeled $\ket{\psi_j}$, then this happens whenever
+\begin{equation}
+\elem{\psi_j}{E_k\ct E_l}{\psi_m} = C_{kl} \delta_{jm}
+\end{equation}
+Due to limited time, we won't go through the proof, but a detailed and accessible proof can be found in section 2.3 of Lidar and Brun. 
+I would like to focus on the interpretation of this formula instead. 
+First, let's note that it implies that any time two different codewords are acted upon by correctable Kraus operators, the resulting states will still be orthogonal. 
+This means that, in theory, a recovery map can be designed which maps them back to the original code states, though this may be difficult in practice. 
 
+Second, and more importantly, it implies that if a code can correct two Kraus operators $E_a$ and $E_b$, it can correct any linear combination of the two.
+I will also not prove this, but it's in section 2.6 of Lidar/Brun.
+If we can correct an $X$, $Y$ or $Z$ error on an arbitrary qubit, though, it follows that we can correct any single-qubit error, since $X$, $Y$, and $Z$ form a basis for the set of possible operators on one qubit.
+It takes a little work to get such a code, we'll see some examples in the next section. 
+\subsection{The Nine-Qubit Code}
+\subsection{The Five-Qubit Code}
+This motivates the introduction of some new formalism, to make sure that the codes we study don't require us to write down an exponential number of parameters.
 \section{The Stabilizer Formalism in a Nutshell}
 There is at least one well-studied way to do this (there are a few others as well, but they're not as popular).
 This theory uses operators instead of quantum states as its representation, because tensor-product operators can give rise to states with non-trivial entanglement, which it turns out is necessary to do error correction [Prove this?].
