@@ -150,11 +150,50 @@ For the first few examples, we won't focus on this, since it's useful to see tha
 If fault tolerance wasn't a big enough problem, we have another one. 
 Error models for quantum systems are much more complex than those for classical bits, because they're \emph{continuous}. They don't map $\ket{\psi}$ to $\ket{\psi_{\perp}}$, but instead to $U\ket{\psi}$ for $U$ some unknown unitary, for example.
 There are even some channels for which no mixture of unitaries can describe the channel's effects. 
+For this general set of quantum channels, we can represent their effects mathematically using a set of operators. 
+This is frequently called the \emph{Kraus representation}, after Karl Kraus. 
+Given these operators (let's call them $E_j$), we calculate the effect of the channel on a density matrix as follows:
+\begin{equation}
+\rho \mapsto \sum_j E_j \rho E_j \ct
+\end{equation}
+There's also a constraint on these operator sets.
+In order to be valid transformations on quantum states, they have to map density matrices to density matrices.
+Since density matrices are positive-semidefinite with trace one, the action of the operator set must be \emph{completely positive} (preserving positivity, even when it acts on \emph{part of a larger system}), and trace-preserving. 
+This is true iff $\sum_j E_j \ct E_j = \id$.
+Let's get this clearer with an example. 
+Let's do bit-flip again, calling the channel $B$:
+\begin{flalign}
+B_0 = \sqrt{1 - p} \begin{bmatrix}
+1 & 0 \\ 0 & 1
+\end{bmatrix}, \quad B_1 = \sqrt{p} \begin{bmatrix}
+0 & 1 \\ 1 & 0 
+\end{bmatrix}
+\end{flalign}
+We can calculate the effect on a one-qubit density matrix with ground state population $q$ and coherence $c$:
+\begin{flalign}
+\rho &= \begin{bmatrix}
+q & c \\ c^\ast & 1-q
+\end{bmatrix} \\
+\sum_j B_j \rho B_j \ct &= (1 - p) \rho + p X \rho X \\
+&= (1 - p) \begin{bmatrix}
+q & c \\ c^\ast & 1-q
+\end{bmatrix}
+ + p \begin{bmatrix}
+   1-q & c^\ast \\c & q
+\end{bmatrix} \\
+&= \begin{bmatrix}
+q + p - 2pq & c - p (c - c^\ast) \\
+c^\ast - p (c^\ast - c) & 1 - p - q + 2pq
+\end{bmatrix}
+\end{flalign}
+\textbf{Exercise: } Sub in the $\ket{0}$ and $\ket{1}$ states. What happens to them?
 
 At first glance, this looks similar to the central problem of analog computing, that it's far easier to force an input from a continuous space to a few discrete values (oh, say, $0 \volts$ and $5 \volts$) than it is to force noisy values to stay close to the value that some arbitrary computation should be at ($x \volts$). 
 For this reason, people with experience in analog computing are wary of quantum computing when they hear about it. 
 All is not lost, though. 
-There's a famous result 
+In the next subsection, we'll see that these analog errors can be \emph{digitized}, but first, we have to define what it means to correct an error in the quantum case.
+\subsection{The Knill-Laflamme Criterion and Noise Digitization}
+
 \section{The Stabilizer Formalism in a Nutshell}
 There is at least one well-studied way to do this (there are a few others as well, but they're not as popular).
 This theory uses operators instead of quantum states as its representation, because tensor-product operators can give rise to states with non-trivial entanglement, which it turns out is necessary to do error correction [Prove this?].
