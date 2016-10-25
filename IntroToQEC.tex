@@ -193,14 +193,14 @@ For this reason, people with experience in analog computing are wary of quantum 
 All is not lost, though. 
 In the next subsection, we'll see that these analog errors can be \emph{digitized}, but first, we have to define what it means to correct an error in the quantum case.
 \subsection{The Knill-Laflamme Criterion and Noise Digitization}
-To talk about which quantum errors can be corrected, we should first make clear that in the typical case, not all of them can be corrected. 
+To talk about which quantum errors can be detected or corrected, we should first make clear that in the typical case, not all of them can be corrected. 
 To see this, consider the quantum bit-flip map defined above, and its action on the quantum bit-flip code $\ket{000},\,\ket{111}$.
 With probability $p^3$, the channel maps one logical state directly to the other. 
 Any sane recovery map would include $\ket{111} \mapsto \ket{111}$, so that there's always some probability of error. 
-However, we can always try to take a subset of the operators $E_j$ and declare it to be exactly correctable. 
-If our codewords are labeled $\ket{\psi_j}$, then this happens whenever
+However, we can always try to take a subset of the operators $E_j$ and declare it to be exactly detectable or correctable. 
+If our (assumed orthogonal) codewords are labeled $\ket{\psi_j}$, then this happens whenever
 \begin{equation}
-\elem{\psi_j}{E_k\ct E_l}{\psi_m} = C_{kl} \delta_{jm}
+\elem{\psi_j}{E_k}{\psi_m} = C_{k} \delta_{jm} \textrm{ or } \elem{\psi_j}{E_k\ct E_l}{\psi_m} = C_{kl} \delta_{jm}
 \end{equation}
 Due to limited time, we won't go through the proof, but a detailed and accessible proof can be found in section 2.3 of Lidar and Brun. 
 I would like to focus on the interpretation of this formula instead. 
@@ -244,7 +244,7 @@ With the tools we have so far, we can't do much more than state the codewords of
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.5\textwidth]{five_qubit_codewords.png}
-\caption{Some codewords, straight jacked from Nielsen/Chuang.}
+\caption{Some codewords, straight jacked from Nielsen/Chuang. I'm pretty sure this code was derived from some obscure research in codes over $GF(4)$, an abstract field that acts like the Paulis in some way.}
 \end{figure}
 \textbf{Exercise for Masochists: }Show that this code can correct an arbitrary single-qubit error using the Knill-Laflamme criteria.
 
@@ -254,21 +254,55 @@ This motivates the introduction of some new formalism, to make sure that the cod
 \section{The Stabilizer Formalism in a Nutshell}
 There is at least one well-studied way to do this (there are a few others as well, but they're not as popular).
 This theory uses sets of operators instead of basis vectors as its representation of a subspace, because tensor-product operators can give rise to states with non-trivial entanglement, which it turns out is necessary to do error correction [Prove this?].
-This is the so-called \emph{Heisenberg picture}. 
+This is the \emph{Heisenberg picture}. 
 
 It's also best to use operators that form a group to do this, that way we don't have to keep track of any matrices during a calculation, we can just use the group operation. 
-Our operators have $+1$ and $-1$ eigenspaces of equal size [Prove this]. 
+If we're bound and determined to use qubits at the physical level to store and process qubits at the logical level, we might as well use a group that has a matrix representation that's $2$-by-$2$, like the Pauli group. 
+To write out tensor products of Paulis, we just put them in a string. 
+These operators have $+1$ and $-1$ eigenspaces of equal size.
+We can see this from the fact that each single-qubit Pauli has a $+1$ and a $-1$ eigenvalue, and that the eigenvalues of a tensor product of two matrices are the Cartesian product of the sets of eigenvalues of the original matrices.  
 This means that, if we want to specify an $n-1$-qubit subspace of a space, we only have to write down one $n$-qubit operator, given as an $\mathcal{O}(n)$-letter string. 
 This means that, in order to define a subspace with $k$ ``logical'' or ``effective'' qubits, 
-we specify $n-k$ stabilisers, using a total of $\mathcal{O}(n^2)$ letters (assuming $k$ doesn't scale with $n$).
+we specify $n-k$ stabilisers, using a total of $\mathcal{O}(n^2)$ letters (assuming $k$ is constant with respect to $n$).
+A rigourous expression of the codespace is as follows:
+\begin{equation}
+C(S) = \set{\ket{\psi} \suchthat s\ket{\psi}=\ket{\psi} \forall s \in S}
+\end{equation}
 
-It remains to be seen that subspaces defined in this way can detect/correct errors.
-Let's show that Pauli errors can be detected if they anticommute with some stabiliser, and that a set can be corrected if any two such errors don't form a logical when you multiply them.
-[Go ahead and show that].
+\textbf{Exercise: }$-\id$ is a Pauli, but it can never be a stabiliser. Why not?
+
+\textbf{Exercise: }In order for a list of $r$ Paulis to generate a stabiliser group with $n-r$ logical qubits, they have to commute and be independent under multiplication. Why?
+
+It remains to be seen that subspaces defined in this way can detect/correct errors, though it is sufficient to detect/correct Pauli errors.
+Let's show that Pauli errors can be detected if they anticommute with some stabiliser.
+
+First, let's note that, for stabiliser codes, logicals commute with the stabiliser, but are not part of it:
+\begin{equation}
+L\ket{\psi} = \ket{\phi}, \,\, \ket{\phi},\, \ket{\psi} \in C(S), \, \ket{\phi} \neq{\ket{\psi}} \\
+\end{equation}
+\begin{flalign}
+s\ket{\phi} &= \ket{\phi} \forall s \\
+\therefore sL\ket{\psi} &= L\ket{\psi} \forall s \\
+\therefore sL\ket{\psi} &= Ls\ket{\psi} \forall s
+\end{flalign}
+Since Paulis either commute or anticommute, this means that $\com{s}{L}=0 \forall s$. 
+
+An error is undetectable when it can change $\braket{\psi}{\phi}$, this is exactly what logicals do. 
+Given Pauli errors, the product has to be a logical for the error to not be correctable. 
+Let's go for an example of errors which are detectable but not correctable for the $5$-qubit code.
 \subsection{CSS codes}
 These are like easy stabiliser codes.
 \subsection{Homological Codes}
 These are like easy CSS codes.
 \subsection{The Surface Code}
 This is like an easy homological code.
+\section{What I Haven't Covered}
+\begin{description}
+\item[How To Encode A Qubit in Your Experiment]: You might have a large spin system, many-level transmon, trapped ion or some other exotic Hilbert space in your laboratory.
+It comes with its own set of noise maps and its own allowed operations at the physical level (maybe these form a universal gate set, maybe not).
+What's the best way to encode a qubit into it?
+Nobody really knows. 
+Most of the time, we make some arbitrary decision, like picking two low-energy levels. 
+It would be interesting to pursue this, though. 
+\end{description}
 \end{document}
