@@ -13,6 +13,7 @@
 \usepackage{mathtools}
 \usepackage{nicefrac}
 \usepackage{tikz}
+\usepackage[]{parskip}
 \usepackage{pgfplots}
 \usepackage{placeins}
 \usepackage{verbatim}
@@ -246,6 +247,7 @@ With the tools we have so far, we can't do much more than state the codewords of
 \includegraphics[width=0.5\textwidth]{five_qubit_codewords.png}
 \caption{Some codewords, straight jacked from Nielsen/Chuang. I'm pretty sure this code was derived from some obscure research in codes over $GF(4)$, an abstract field that acts like the Paulis in some way.}
 \end{figure}
+
 \textbf{Exercise for Masochists: }Show that this code can correct an arbitrary single-qubit error using the Knill-Laflamme criteria.
 
 The Shor code may have seemed clunky, but the fact that it could be decomposed into other codes meant we didn't really have to write out the codewords in the computational basis.
@@ -271,7 +273,20 @@ C(S) = \set{\ket{\psi} \suchthat s\ket{\psi}=\ket{\psi} \forall s \in S}
 
 \textbf{Exercise: }$-\id$ is a Pauli, but it can never be a stabiliser. Why not?
 
-\textbf{Exercise: }In order for a list of $r$ Paulis to generate a stabiliser group with $n-r$ logical qubits, they have to commute and be independent under multiplication. Why?
+\textbf{Exercise: }In order for a list of $r$ Paulis to generate a stabiliser group with $n-r$ logical qubits, they have to commute and be independent under multiplication. Why?\\
+{\LARGE \textbf{end of day 1}}\\
+{\LARGE \textbf{start of day 2}}\\
+Since this is the beginning of the lecture, let's get into a bit of a digression. 
+
+Last lecture, we saw that we can represent subspaces of a Hilbert space using lists of Pauli operators. 
+We're going to use these spaces as error-correcting codes in a little while, but let's take a look at other things we can do with them:
+\subsubsection{Study Entangled States}
+Recall that the dimension of the subspace described by some stabiliser group is $2^{n-r}$, where $r$ is the number of generators and $n$ is the number of qubits. 
+If $n=r$, then we're describing a unique state, one which is usually pretty entangled. 
+We can express this state as a rank-one projector which we derive from the stabiliser generators in the following fashion. 
+First, we note that each Pauli can be expressed as the difference between two projectors, one onto its +1 eigenspace and 
+\subsubsection{Express Commuting Hamiltonian Ground States}
+Sometimes, 
 
 It remains to be seen that subspaces defined in this way can detect/correct errors, though it is sufficient to detect/correct Pauli errors.
 Let's show that Pauli errors can be detected if they anticommute with some stabiliser.
