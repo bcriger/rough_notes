@@ -212,11 +212,48 @@ I will also not prove this, but it's in section 2.6 of Lidar/Brun.
 If we can correct an $X$, $Y$ or $Z$ error on an arbitrary qubit, though, it follows that we can correct any single-qubit error, since $X$, $Y$, and $Z$ form a basis for the set of possible operators on one qubit.
 It takes a little work to get such a code, we'll see some examples in the next section. 
 \subsection{The Nine-Qubit Code}
+First, let's make a note of what happens if a $Z$ error acts on the bit-flip code.
+\begin{equation}
+\alpha \ket{000} + \beta \ket{111} \mapsto \alpha \ket{000} - \beta \ket{111}. 
+\end{equation}
+This is the equivalent of a logical $Z$ operation, so this code cannot correct $Z$ errors. 
+There is, however, a code which corrects $Z$ errors, it consists of the states $\ket{+++}$ and $\ket{---}$. When $Z$ acts on these states, they get mapped to $\ket{++-}$, et cetera, exactly as would happen if we acted $X$ on the states $\ket{000}$ and $\ket{111}$. Now is as good a time as any to put in some circuits for bit-flip, phase-flip and Shor encoding/decoding (from Chapter 2 of Lidar/Brun by Dave Bacon, used without permission$_{_\textsf{yolo}}$):
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.5\textwidth]{bacon_bf_repetition_circuit.png}
+\caption{Typical circuit for an error correction scenario with only one noisy channel. In this case, the channel is a bit-flip, so we encode $\alpha \ket{0} + \beta \ket{1}$ into $\alpha \ket{000} + \beta \ket{111}$ for redundancy.}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.5\textwidth]{bacon_pf_repetition_circuit.png}
+\caption{Same deal as before, but with phase-flip, so we encode $\alpha \ket{0} + \beta \ket{1}$ into $\alpha \ket{+++} + \beta \ket{---}$ for redundancy. Bacon uses a $W$ for the Hadamard gate. Maybe this stands for Walsh, maybe not. We may never know \ldots}
+\end{figure}
+Given these two circuits, we can take a look at \emph{concatenation}, where we encode the logical qubits of one code into another code:
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.5\textwidth]{bacon_9bit_circuit.png}
+\caption{Each physical bit of the three-qubit code versus phase flip is encoded into a three-qubit code versus bit-flip to construct a nine-qubit \emph{Shor code}.}
+\end{figure}
+
+\textbf{Exercise: } Show that this code can also correct a single $Y$ error on any qubit. 
+
+Even though we get $Y$ error correction `for free' since it's the product of an $X$ and a $Z$, this is still a little clunky. In the next section, we take a look at a code which can correct an arbitrary single-qubit error using only five qubits.
 \subsection{The Five-Qubit Code}
+With the tools we have so far, we can't do much more than state the codewords of this code:
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.5\textwidth]{five_qubit_codewords.png}
+\caption{Some codewords, straight jacked from Nielsen/Chuang.}
+\end{figure}
+\textbf{Exercise for Masochists: }Show that this code can correct an arbitrary single-qubit error using the Knill-Laflamme criteria.
+
+The Shor code may have seemed clunky, but the fact that it could be decomposed into other codes meant we didn't really have to write out the codewords in the computational basis.
+This is valuable, since there can be exponentially many terms in such a decomposition. 
 This motivates the introduction of some new formalism, to make sure that the codes we study don't require us to write down an exponential number of parameters.
 \section{The Stabilizer Formalism in a Nutshell}
 There is at least one well-studied way to do this (there are a few others as well, but they're not as popular).
-This theory uses operators instead of quantum states as its representation, because tensor-product operators can give rise to states with non-trivial entanglement, which it turns out is necessary to do error correction [Prove this?].
+This theory uses sets of operators instead of basis vectors as its representation of a subspace, because tensor-product operators can give rise to states with non-trivial entanglement, which it turns out is necessary to do error correction [Prove this?].
 This is the so-called \emph{Heisenberg picture}. 
 
 It's also best to use operators that form a group to do this, that way we don't have to keep track of any matrices during a calculation, we can just use the group operation. 
