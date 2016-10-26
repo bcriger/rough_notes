@@ -285,7 +285,7 @@ Recall that the dimension of the subspace described by some stabiliser group is 
 If $n=r$, then we're describing a unique state, one which is usually pretty entangled. 
 We can express this state as a rank-one projector which we derive from the stabiliser generators in the following fashion. 
 First, we note that each Pauli can be expressed as the difference between two projectors, one onto its $+1$ eigenspace and one onto its $-1$ eigenspace:
-\begin{equation}https://github.com/bcriger/rough_notes/blob/master/IntroToQEC.pdf
+\begin{equation}
 p = \Pi_{p,+1} - \Pi_{p,-1} \forall p \in P 
 \end{equation}
 Also, we can express the identity as a sum over the same projectors:
@@ -347,18 +347,98 @@ If we select a set of stabilisers (which seems easy enough to do), how many inde
 The answer to this question is the \emph{distance} of the code, and it is the minimum weight (expressed in terms of one-qubit errors) of a logical operator.\\ 
 \textbf{Exercise: }A na\"ive but commonly-used method for finding the distance of a code is to obtain a set of logical operators and multiply them by all possible elements of the stabiliser group, keeping track of the minimum weight encountered. Is there a better method? How about for classical codes?
 
+As a side note, I'll mention here that classical linear codes with $n$ physical bits, $k$ logical bits and distance $d$ are often referred to as $(n,\,k,\,d)$ codes, and quantum codes with the same parameters are called $\qec{n}{k}{d}$ codes.
+
 This question drives us to design quantum codes using classical codes as components, since there are many large families of classical codes whose distances are known. 
 We consider this in the following section.
-\subsection{CSS codes}
+\subsection{CSS Codes}
 We saw, in our discussion of the Shor nine-qubit code, that we can correct all possible one-qubit errors as long as we can correct an $X$ and a $Z$ error which occur on any qubit, since $Y_j \sim X_j Z_j$. 
 Our recipe for codes that achieve this was based on a few ideas:
 \begin{description}
 \item[Classical-to-Quantum] We waved our hands pretty hard on an example of the three-qubit repetition code to come up with a circuit that produces a quantum version of this code, we will reveal the ideas behind this in this section.
-\item[$X$/$Z$ Equivalence] We took that same repetition code and Hadamard-transformed all the bits, producing a code that corrects $Z$ errors (``phase flips'')
+\item[$X$/$Z$ Equivalence] We took that same repetition code and Hadamard-transformed all the bits, producing a code that corrects $Z$ errors (``phase flips'') given a code that corrects $X$ errors (``bit flips''). 
+This is also general, and we will take advantage of this further.
+\item[Concatenation] To unite two codes and obtain the error correcting properties of each, we encoded a code in a code. 
+This can be accomplished with any two stabiliser codes, but if the two codes $C$ and $C'$ use $n$ and $n'$ qubits, respectively, then the concatenated code uses $n \times n'$ qubits, which is pretty high overhead just to be able to correct single-qubit errors. 
+We will see in this section that this is not necessary, and an alternate construction can yield smaller codes. 
 \end{description}
+To do this, we use a construction that takes classical codes (on $\mathbb{Z}_2$) to quantum codes that correct one error type.
 
+This construction is based on the \emph{parity check matrix} of a classical code, which is a matrix whose kernel is the codespace.
+We usually keep track of this kernel by writing it out as a matrix of column vectors called the \emph{generator matrix}. 
+This is best understood by example:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}
+\node[matrix, ampersand replacement=\&]{
+\node at (0,0) { $\begin{aligned}
+G_3 = \begin{bmatrix}
+1 \\ 
+1 \\
+1
+\end{bmatrix}, \,\,
+H_3  = \begin{bmatrix}
+1 & 1 & 0 \\
+0 & 1 & 1 \\
+\end{bmatrix}
+\end{aligned}$}; \&
+\node at (0,0) {$\begin{aligned}
+G_7 = \begin{bmatrix}
+0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 1 & 1 & 1 \\
+1 & 0 & 0 & 0 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 1
+\end{bmatrix}, \,\,
+H_7 = \begin{bmatrix}
+1 & 1 & 1 & 1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 1 & 1 & 0 \\
+1 & 0 & 1 & 0 & 1 & 0 & 1 \\
+\end{bmatrix}
+\end{aligned}$}; \\
+\node {Repetition Code}; \&
+\node {Hamming Code}; \\
+};
+\end{tikzpicture}
+\caption{Some parity check and generator matrices.}
+\end{figure}
+
+There's a convenient feature of classical linear codes that allows them to be translated into quantum codes, which is the relationship between inner products of vectors over $\mathbb{Z}_2$ and commutation of certain Pauli operators. 
+Consider a Pauli operator which is of the form $X_{S} \otimes \id_{\bar{S}}$, and another which is of the form $Z_{S'} \otimes \id_{\bar{S'}}$, and suppose for the sake of the example that $S\cup \bar{S} = S' \cup \bar{S'} = \mathbf{S}$. 
+We recall that
+\begin{equation}
+(a \otimes b) (c \otimes d) = ac \otimes bd.
+\end{equation}
+This means that our giant tensor product decomposes as follows:
+\begin{flalign}
+\left(\bigotimes_{j \in S} X_j \otimes \bigotimes_{j \in \bar{S}} \id_j \right)\left(\bigotimes_{j \in S'} Z_j \otimes \bigotimes_{j \in \bar{S'}} \id_j \right) &= \bigotimes_{j \in S \triangle (S\cap S')} X_j \otimes \bigotimes_{j \in (S\cap S')} X_j Z_j \otimes \bigotimes_{j \in S' \triangle (S\cap S')} Z_j \otimes \bigotimes_{j \notin (S \cup S')} \id_j \\
+& = (-1)^{\abs{S \cap S'}} \bigotimes_{j \in S \triangle (S\cap S')} X_j \otimes \bigotimes_{j \in (S\cap S')} Z_j X_j \otimes \bigotimes_{j \in S' \triangle (S\cap S')} Z_j \otimes \bigotimes_{j \notin (S \cup S')} \id_j, 
+\end{flalign}
+therefore a big $X$ Pauli and a big $Z$ Pauli commute if the set $S\cap S'$ is even size. 
+If we represent these sets as bit vectors by putting a $1$ on any element in the set, and a $0$ on any element outside the set, this is exactly the idea that the inner product of these two vectors should be $0$ in order for these Paulis to commute. 
+
+If I take some classical code, then, and I replace the $1$s of the parity check matrix with $X$s or $Z$s, I get a code that corrects $Z$s or $X$s with the same distance, and has logical $Z$s or $X$s that I can derive from the generator matrix. 
+This construction doesn't always lead to a useful code, like if we tried this with the repetition code (do this in the lecture).
+If we try this with the Hamming code, though, we get a useful code. 
 \subsection{Homological Codes}
-These are like easy CSS codes.
+Access to 70 years' worth of coding literature is nice, but our technology is pretty limited in terms of what stabilisers we can implement. 
+Also, we'd like to search for Hamiltonians that correct quantum errors when you let them thermalize, and these Hamiltonians ought to be few-body, translationally invariant and geometrically local. 
+This drives us to try to construct CSS codes that incorporate these ideas of locality. 
+
+We can start by taking a look at \emph{graphs}, which are mathematical descriptions of networks. 
+The math language for these things is that they are made of two sets, one labeled $V$ (the set of \emph{vertices}, also called \emph{nodes}) and another one $E$, (the set of \emph{edges}, AKA \emph{links}, each of which is of the form $(v,v')$ with $v$ and $v'$ being elements of $V$). 
+We can construct commuting $X$ and $Z$ Paulis on networks by putting attaching a qubit to each edge, and associating a $Z$ Pauli with the edges in each cycle, and an $X$ pauli with the edges which touch a given vertex, and obtain a commuting state. 
+Why? Because every cycle has two edges in common with every vertex:
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.5\textwidth]{graph_intersection.pdf}
+\caption{Every cycle shares either $0$ or $2$ edges with the `star' associated with a vertex.}
+\end{figure}
+If we construct stabilisers in this fashion, then the `star' stabilisers are small if the maximum degree of the graph is small, and we can construct large graphs that have small degree.
+These stabilisers also have a notion of locality baked in. 
+The $Z$ stabilisers are not yet local or small, since I can draw a gigantic cycle over the 
 \subsection{The Surface Code}
 This is like an easy homological code.
 \section{What I Haven't Covered}
