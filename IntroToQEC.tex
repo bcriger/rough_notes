@@ -438,9 +438,77 @@ Why? Because every cycle has two edges in common with every vertex:
 \end{figure}
 If we construct stabilisers in this fashion, then the `star' stabilisers are small if the maximum degree of the graph is small, and we can construct large graphs that have small degree.
 These stabilisers also have a notion of locality baked in. 
-The $Z$ stabilisers are not yet local or small, since I can draw a gigantic cycle over the 
+The $Z$ stabilisers are not yet local or small, since I can draw a gigantic cycle over the whole graph if I want. 
+To solve this problem, we choose a specific set of small cycles and label them \emph{faces}.
+This adds structure to the graph, turning it into a \emph{tiling}. 
+This is even more physical, you have probably actually touched a tiling today. 
+
+There's a lot of math literature about tilings, especially \emph{regular} and \emph{semi-regular} tilings, where the tiles are all similar shapes. 
+These tilings are nice to focus on, since their tiles have bounded size, which keeps the stabilisers small and local. 
+The only decision that remains is what kind surface to tile.
+Here, we can also pick up a result from the math literature, the \emph{Euler characteristic}. 
+
+The number of qubits in some tiling-based code is $\abs{E}$.
+The number of stabilisers is $\abs{V} + \abs{F}$. 
+WAIT! 
+We have to check how many of these stabilisers are \emph{independent}. 
+Each edge has two neighbouring faces and two neighbouring vertices. 
+We know that $\id$ is in the stabiliser. 
+However, if we take the product of all the stars, or all the faces, each qubit is hit exactly twice by an $X$ or $Z$, so there are two products of stabilisers that are `redundant', they produce something that is already in the stabiliser. 
+Therefore, the number of logical qubits in the code is 
+\begin{equation}
+\abs{E} - \abs{V} - \abs{F} + 2 
+\end{equation}
+There's an old result in the theory of tilings that tells us that this number is exactly twice the number of `holes' or `handles' in the surface we tile, completely independent of the tiling we chose\textsubscript{\textsubscript{amazing}}.
+The logical operators are just the cycles which are not constructed from tiles, and the length of the minimum size one is called the \emph{systole} (there are algorithms for calculating this). 
+There's also lots of research into tilings of hyperbolic spaces, where the number of holes actually does grow with the size of the tiling, so that the number of logical qubits increases when we increase the size of the code. 
 \subsection{The Surface Code}
-This is like an easy homological code.
+Let's begin by picking the most boring possible tiling ($L$-by-$L$ square) of the most boring non-trivial surface (2D torus), and see what we get:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.95]
+\draw[step=1cm, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (5,5);
+\draw[step=1cm, line width = 2pt] (0,0) grid (4.99,4.99);
+\draw[black, line width=14pt, line cap=round, line join=round] (1, 1) rectangle (2, 2);
+\draw[orange, line width=12pt, line cap=round, line join=round] (1, 1) rectangle (2, 2);
+\draw[black] (1,1.5) node{$Z$};
+\draw[black] (1.5,2) node{$Z$};
+\draw[black] (2,1.5) node{$Z$};
+\draw[black] (1.5,1) node{$Z$};
+\draw[black, line width=14pt, line cap=round, line join=round] (3, 2) -- (3, 4);
+\draw[black, line width=14pt, line cap=round, line join=round] (2, 3) -- (4, 3);
+\draw[orange, line width=12pt, line cap=round, line join=round] (3, 2) -- (3, 4);
+\draw[orange, line width=12pt, line cap=round, line join=round] (2, 3) -- (4, 3);
+\draw[black] (2.25,3) node{$X$};
+\draw[black] (3.75,3) node{$X$};
+\draw[black] (3,2.25) node{$X$};
+\draw[black] (3,3.75) node{$X$};
+\draw[black, line width=14pt, line cap=round, line join=round] (0, 0) -- (0, 5);
+\draw[blue!50!white, line width=12pt, line cap=round, line join=round] (0, 0) -- (0, 5);
+\draw[black] (0,2.5) node {$\bar{Z}_1$};
+\draw[black, line width=14pt, line cap=round, line join=round] (0, 0) -- (5, 0);
+\draw[blue!50!white, line width=12pt, line cap=round, line join=round] (0, 0) -- (5, 0);
+\draw[black] (2.5,0) node {$\bar{Z}_2$};
+\draw[black, line width=14pt, line cap=round, line join=round] (0, 4.5) -- (5, 4.5);
+\draw[blue!50!white, line width=12pt, line cap=round, line join=round] (0, 4.5) -- (5, 4.5);
+\draw[black] (2.5,4.5) node {$\bar{X}_1$};
+\draw[black, line width=14pt, line cap=round, line join=round] (4.5, 0) -- (4.5, 5);
+\draw[blue!50!white, line width=12pt, line cap=round, line join=round] (4.5, 0) -- (4.5, 5);
+\draw[black] (4.5,2.5) node {$\bar{X}_2$};
+\draw[black, line width=14pt, line cap=round, line join=round] (4, 4.5) -- (5, 4.5);
+\draw[blue!50!white, line width=12pt, line cap=round, line join=round] (3, 4.5) -- (5, 4.5);
+\end{tikzpicture}
+\caption{What we get.}
+\end{figure}
+
+This is pretty convenient, it's got small stabilisers that are arranged in an almost planar pattern. 
+We can make it planar by cutting the torus, either in half or just into a rectangle:
+
+\textbf{Exercise: } Draw this.
+
+This is the one code that everyone's trying to optimize and use, because it's the most well-studied. 
+It's also the most well-studied because everyone's trying to optimize it and use it. 
+I hope that the idea gets across that these codes are a subset of a subset of a subset of a subset of the possible codes. 
 \section{What I Haven't Covered}
 \begin{description}
 \item[How To Encode A Qubit in Your Experiment]: You might have a large spin system, many-level transmon, trapped ion or some other exotic Hilbert space in your laboratory.
