@@ -284,10 +284,44 @@ We're going to use these spaces as error-correcting codes in a little while, but
 Recall that the dimension of the subspace described by some stabiliser group is $2^{n-r}$, where $r$ is the number of generators and $n$ is the number of qubits. 
 If $n=r$, then we're describing a unique state, one which is usually pretty entangled. 
 We can express this state as a rank-one projector which we derive from the stabiliser generators in the following fashion. 
-First, we note that each Pauli can be expressed as the difference between two projectors, one onto its +1 eigenspace and 
-\subsubsection{Express Commuting Hamiltonian Ground States}
-Sometimes, 
+First, we note that each Pauli can be expressed as the difference between two projectors, one onto its $+1$ eigenspace and one onto its $-1$ eigenspace:
+\begin{equation}https://github.com/bcriger/rough_notes/blob/master/IntroToQEC.pdf
+p = \Pi_{p,+1} - \Pi_{p,-1} \forall p \in P 
+\end{equation}
+Also, we can express the identity as a sum over the same projectors:
+\begin{equation}
+\id = \Pi_{p,+1} + \Pi_{p,-1} \forall p \in P 
+\end{equation}
+Therefore, we can write the projector $\Pi_{p,+1}$ as $\nicefrac{1}{2}(p + \id)$ for any $p$, and express the projector onto the mutual $+1$ eigenspace as the product of all these projectors:
+\begin{equation}
+\Pi_S = \frac{1}{2^r}\prod_{s \in S} (\id + s) = \frac{1}{2^r}\sum_{s' \in \group{S}} s' = \proj{\psi} \textrm{ (if $n=r$)}
+\end{equation}
+where the last step is a little combinatorics, and I've put the generators of the stabiliser in the set $S$, with $\group{S}$ being the generated group. 
 
+This is kind of neat, it gives us a direct mapping to projectors onto subspaces, which are states when $n=r$. 
+It's not useless, either, since it makes taking the partial trace really easy. 
+Let's divide the qubits into two regions $R$ and its complement $\bar{R}$.
+The partial trace over $\bar{R}$ can be expressed as follows:
+\begin{equation}
+\tr_{\bar{R}} \left[ \proj{\psi} \right] = \tr_{\bar{R}} \left[ \frac{1}{2^n}\sum_{s' \in \group{S}} s' \right] = \frac{1}{2^n} \sum_{s' \in \group{S}} \tr_{\bar{R}} \left[ s' \right] = \frac{1}{2^n} \sum_{s' \in \group{S}} s'_R \times \tr \left( s'_{\bar{R}} \right),
+\end{equation}
+where $p_r$ is the Pauli $p$ restricted to the region $r$ (e.g. $(X_1 Y_2 Z_3)_{23} = Y_2 Z_3$). 
+If $s'_{\bar{R}}$ is anything other than the identity, its trace is 0 (neat property of Pauli matrices), so the sum simplifies to:
+\begin{equation}
+\tr_{\bar{R}} \left[ \proj{\psi} \right] = \frac{1}{2^n} \sum_{s' \in \group{S}, s'_{\bar{R}}=\id } s'_R, 
+\end{equation}
+a uniformly mixed state over a different stabiliser subspace. 
+The ease with which we can take this partial trace looks like it makes the calculation of the Von Neumann entropy easier, but I haven't checked.
+\subsubsection{Express Commuting Hamiltonian Ground States}
+Actual Physicists\textsuperscript{\textregistered} like to calculate the ground states of local Hamiltonians. 
+For spin systems, the terms in these Hamiltonians are sometimes tensor products of Pauli operators. 
+When these terms commute, the Hamiltonian can be expressed as 
+\begin{equation}
+H = -E\sum_{s \in \tilde{S}\subset \group{S}}s, 
+\end{equation}
+and the ground state (or states) are in the stabiliser subspace of the generator $S$.
+This is pretty interesting, because we can try to design codes that \emph{correct themselves} when exposed to thermal noise, provided that the amount of energy needed to produce a logical error scales with the size of the system (this is different than just saying that the code has a distance that scales with the size of the system, as we will see later). 
+\subsection{Actual Error Correction}
 It remains to be seen that subspaces defined in this way can detect/correct errors, though it is sufficient to detect/correct Pauli errors.
 Let's show that Pauli errors can be detected if they anticommute with some stabiliser.
 
@@ -303,10 +337,26 @@ s\ket{\phi} &= \ket{\phi} \forall s \\
 Since Paulis either commute or anticommute, this means that $\com{s}{L}=0 \forall s$. 
 
 An error is undetectable when it can change $\braket{\psi}{\phi}$, this is exactly what logicals do. 
-Given Pauli errors, the product has to be a logical for the error to not be correctable. 
+Given a set of potential Pauli errors, the product of any two has to be a logical for the error to not be correctable. 
 Let's go for an example of errors which are detectable but not correctable for the $5$-qubit code.
+This code has $2^4 = 16$ possible syndromes, and $1 + 5\cdot 3 = 16$ correctable errors ($\id$ and $X$/$Y$/$Z$ on every qubit), so any error outside of this set ought to do, let's try $XXIII$. 
+Sure enough, it anticommutes with $XZZXI$ and $ZXIXZ$, but commutes with $IXZZX$ and $XIXZZ$, which is the exact thing that $IIIZI$ does, so this error will be decoded incorrectly, even though it can be detected. 
+
+It's all well and good to say that there are some codes that can be \emph{analysed} efficiently, but what about designing them?
+If we select a set of stabilisers (which seems easy enough to do), how many independent one-qubit errors can be corrected?
+The answer to this question is the \emph{distance} of the code, and it is the minimum weight (expressed in terms of one-qubit errors) of a logical operator.\\ 
+\textbf{Exercise: }A na\"ive but commonly-used method for finding the distance of a code is to obtain a set of logical operators and multiply them by all possible elements of the stabiliser group, keeping track of the minimum weight encountered. Is there a better method? How about for classical codes?
+
+This question drives us to design quantum codes using classical codes as components, since there are many large families of classical codes whose distances are known. 
+We consider this in the following section.
 \subsection{CSS codes}
-These are like easy stabiliser codes.
+We saw, in our discussion of the Shor nine-qubit code, that we can correct all possible one-qubit errors as long as we can correct an $X$ and a $Z$ error which occur on any qubit, since $Y_j \sim X_j Z_j$. 
+Our recipe for codes that achieve this was based on a few ideas:
+\begin{description}
+\item[Classical-to-Quantum] We waved our hands pretty hard on an example of the three-qubit repetition code to come up with a circuit that produces a quantum version of this code, we will reveal the ideas behind this in this section.
+\item[$X$/$Z$ Equivalence] We took that same repetition code and Hadamard-transformed all the bits, producing a code that corrects $Z$ errors (``phase flips'')
+\end{description}
+
 \subsection{Homological Codes}
 These are like easy CSS codes.
 \subsection{The Surface Code}
