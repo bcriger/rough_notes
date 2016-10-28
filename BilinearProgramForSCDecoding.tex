@@ -121,7 +121,6 @@ That is, there are multiple minimum-weight paths between syndromes which are equ
 \foreach \x/\y/\synd in {3/7/$X$, 7/3/$X$}{
 \node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
 }
-
 \end{tikzpicture}
 \caption{Possible $X$ syndrome pair. 
 If the decoder determines that a length-4 chain exists between the two, such a path can be restricted to a bounding box whose interior is marked with black squares above. 
@@ -148,9 +147,34 @@ We can immediately see the problem.
 A single $Y$ error has an effective weight of two, since it is detected as a length-one $X$ chain and a length-one $Z$ chain in the absence of other errors. 
 To fix this, let's make the unjustified assumption that $p_X=p_Y=p_Z$. 
 They're going to be different, later (we'll actually have a very different error model later), but this is an easy place to start. 
-
 This results in ``free edges'', since adding a $Z$ error to an edge where there's already an $X$ error results in a $Y$ error, incurring no additional cost. 
+We can always adjust the costs we derive to determine how to compensate for a lower $p_Y$. 
+In case of a higher $p_Y$, we can probably do a trivial code redesign to ensure that the type of error that produces excess syndromes is the least likely. 
 \section{Optimisation Problem}
+I'd like to have a nice structure for an optimisation problem, so I can look at slackness and adapt Blossom. 
+It's not working, for the following reasons:
+\subsection{Cost Not Given By Single Intersection}
+In the crisp, clean picture of what these chains look like, we subtract one unit of weight whenever one chain crosses another:
+\begin{figure}
+[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x/\y/\err in {3/2/$X$, 3/4/$X$, 3/6/$Y$, 3/8/$X$, 5/6/$Z$}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){\err};
+}
+\foreach \x/\y/\synd in {2/6/$Z$, 6/6/$Z$, 3/1/$X$, 3/9/$X$}{
+\node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
+}
+\end{tikzpicture}
+\caption{This is not a minimum-length path, but it would be on a larger lattice, so it's legitimate.}
+\end{figure}
+
+If all the chains intersected like this, we'd have a bilinear program on our hands. 
+In this world, we would just record which minimum-length paths intersect in one position with which others, and evaluate the cost by pricing the $X$ and $Z$ chains separately, then evaluating a matrix element which counts the number of intersections and subtract that off. 
+The first problem is that minimum-length paths which aren't straight can intersect in weird ways:
 \bibliographystyle{plain}
 \bibliography{BilinearProgramForSCDecoding}
 \section*{Appendices}
