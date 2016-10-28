@@ -56,7 +56,7 @@ Edges with no marker are not subject to error.
 Dotted edges indicate `wrapping around' the boundary to create a torus.}
 \end{figure}
 
-the parity checks of this code respond to $X$ and $Z$ errors, indicating when an odd number of $X$ errors surround a tile, and an odd number of $Z$ errors surround a vertex:
+The parity checks of this code respond to $X$ and $Z$ errors, indicating when an odd number of $X$ errors surround a tile, and an odd number of $Z$ errors surround a vertex:
 \begin{figure}[!h]
 \centering
 \begin{tikzpicture}[scale=0.75]
@@ -73,8 +73,7 @@ the parity checks of this code respond to $X$ and $Z$ errors, indicating when an
 \caption{Syndromes corresponding to $X$ and $Z$ errors.}
 \end{figure}
 \FloatBarrier
-There are a few things that we can notice about these syndromes. 
-First, if a continuous chain of errors of the either $X$ or $Z$ type appears on the lattice, two syndromes will appear at the endpoints. 
+One thing to notice about these syndromes is that, if a continuous chain of errors of the either $X$ or $Z$ type appears on the lattice, two syndromes will appear at the endpoints of the chain.
 If only $X$ and $Z$ errors occur, then, the assignment of an error to a given syndrome in the toric code can be reduced to minimum-weight perfect matching, since the probability of an error chain can be expressed as a function of the distance between the syndromes.
 
 If $Y$ errors could be independently detected and decoded in the same fashion, we'd be done. 
@@ -107,9 +106,30 @@ I have beef with this:
 This factor may be larger if we iterate, using each matching to reweight the other graph until convergence.
 \item Performance can, in principle, depend on which graph we match first. It may be the case that both orders ($XZ$ and $ZX$) have to be attempted in parallel to get a decent solution. 
 Even then, we have no guarantee that $Y$ errors can be accurately inferred given a decoding procedure that puts $X$ and $Z$ steps in order like this. 
+\item Last, but certainly not least, there is a massive degeneracy which the re-weighting approach ignores. 
+That is, there are multiple minimum-weight paths between syndromes which are equally valid, and a re-weighting decoder chooses one seemingly arbitrarily. 
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x in {3, 5, 7}{
+\foreach \y in {3, 5, 7}{
+\node[fill=black] at (\x,\y){};
+}
+}
+\foreach \x/\y/\synd in {3/7/$X$, 7/3/$X$}{
+\node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
+}
+
+\end{tikzpicture}
+\caption{Possible $X$ syndrome pair. 
+If the decoder determines that a length-4 chain exists between the two, such a path can be restricted to a bounding box whose interior is marked with black squares above. 
+Only if the two syndromes are collinear is there a unique path.}
+\end{figure}
 \end{itemize}
 We'd prefer to have a solution that can handle $Y$ errors `out of the box', to try to put them on the same footing as $X$ and $Z$. 
-In the rest of this document, I show how arbitrary-length $Y$-chains can be accurately weighed, provided that the problem is generalised to a bilinear program. 
+In the rest of this document, I loosely explore this kind of thing. 
 \section{Weights}
 To derive the bilinear program, let's first show how the linear program for decoding syndromes independently is derived (see \cite{DKLP} for a longer and stronger explanation).
 We begin by writing the probability of an $X$ error that produces pairs of $X$ syndromes, according to an independent error model:
@@ -126,7 +146,10 @@ Maximizing the likelihood, then, is equivalent to minimizing the sum of lengths 
 
 We can immediately see the problem. 
 A single $Y$ error has an effective weight of two, since it is detected as a length-one $X$ chain and a length-one $Z$ chain in the absence of other errors. 
-To fix this, let's consider a few examples. 
+To fix this, let's make the unjustified assumption that $p_X=p_Y=p_Z$. 
+They're going to be different, later (we'll actually have a very different error model later), but this is an easy place to start. 
+
+This results in ``free edges'', since adding a $Z$ error to an edge where there's already an $X$ error results in a $Y$ error, incurring no additional cost. 
 \section{Optimisation Problem}
 \bibliographystyle{plain}
 \bibliography{BilinearProgramForSCDecoding}
