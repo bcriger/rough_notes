@@ -37,11 +37,70 @@
 \begin{document}
 \maketitle
 \section{Introduction}
-The toric code is a popular 2D 
+The toric code is a popular 2D nearest-neighbour LDPC code whose decoding can be efficiently accomplished by minimum-weight perfect matching. 
+Qubits are placed on the edges of a square tiling of a 2D torus, and are subjected to one of three errors, with labels $X$, $Y$ and $Z$:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x/\y/\err in {5/2/$Z$, 7/2/$Z$, 3/6/$X$, 2/7/$X$, 7/8/$Y$}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){\err};
+}
+\end{tikzpicture}
+\caption{5-by-5 toric code lattice with an error configuration.
+Qubits are supported on each edge, of which there are 50.
+Five of these qubits have been subject to an error, drawn from the set $\set{X,\,Y,\,Z}$. 
+Edges with no marker are not subject to error. 
+Dotted edges indicate `wrapping around' the boundary to create a torus.}
+\end{figure}
 
-The assignment of an error to a given syndrome in the toric code can be reduced to minimum-weight perfect matching if $X$ errors and $Z$ errors occur independently, since the probability of an error chain can be expressed as a function of the distance between the syndromes. 
-This argument changes if there's an independent source of $Y$ errors, though $(p_Y \neq p_X p_Z)$, because the probability of an error that triggers an $X$ syndrome is now correlated with the probability of an error that triggers a $Z$ syndrome.
+the parity checks of this code respond to $X$ and $Z$ errors, indicating when an odd number of $X$ errors surround a tile, and an odd number of $Z$ errors surround a vertex:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x/\y/\err in {5/2/$Z$, 7/2/$Z$, 3/6/$X$, 2/7/$X$, 7/8/$Y$}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){\err};
+}
+\foreach \x/\y/\synd in {4/2/$Z$, 8/2/$Z$, 3/5/$X$, 1/7/$X$}{
+\node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
+}
+\end{tikzpicture}
+\caption{Syndromes corresponding to $X$ and $Z$ errors.}
+\end{figure}
+\FloatBarrier
+There are a few things that we can notice about these syndromes. 
+First, if a continuous chain of errors of the either $X$ or $Z$ type appears on the lattice, two syndromes will appear at the endpoints. 
+If only $X$ and $Z$ errors occur, then, the assignment of an error to a given syndrome in the toric code can be reduced to minimum-weight perfect matching, since the probability of an error chain can be expressed as a function of the distance between the syndromes.
+
+If $Y$ errors could be independently detected and decoded in the same fashion, we'd be done. 
+The problem is that, due to Quantum Code Technicalities\textsuperscript{\textregistered}, a $Y$ error produces a pair of $X$ \emph{and} $Z$ syndromes:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x/\y/\err in {5/2/$Z$, 7/2/$Z$, 3/6/$X$, 2/7/$X$, 7/8/$Y$}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){\err};
+}
+\foreach \x/\y/\synd in {4/2/$Z$, 8/2/$Z$, 3/5/$X$, 1/7/$X$, 7/9/$X$, 7/7/$X$, 6/8/$Z$, 8/8/$Z$}{
+\node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
+}
+\end{tikzpicture}
+\caption{Syndromes corresponding to $X$, $Y$ and $Z$ errors.}
+\end{figure}
+
+Our decoding problem is made more difficult by this, though decent performance can still be obtained by assuming that $Y$ errors occur with probability $\sim p^2$ (this works because a $Y$ error is the result of an $X$ and a $Z$ error occurring on the same qubit, bu we don't need to get into it), and decoding the $X$ and $Z$ syndromes independently.
+This leaves a gap in the decoder's performance, that we're hoping to fix.
+ 
 Existing approaches for this problem \cite{Fowler, DelfosseTillich} rely on \emph{reweighting}, adjusting the edge weights in an $X$ syndrome graph based on where $Z$ errors have been inferred, or vice versa. 
+These weights are derived from \emph{conditional} probabilities, treating $p(Y)=p\left(X\given Z \right)$ or $p\left(Z\given X \right)$.
+
 I have beef with this:
 \begin{itemize}
 \item It multiplies runtime by a factor of at least two, since the matching problem must be solved for one graph before the result can be applied to the other. 
@@ -52,7 +111,22 @@ Even then, we have no guarantee that $Y$ errors can be accurately inferred given
 We'd prefer to have a solution that can handle $Y$ errors `out of the box', to try to put them on the same footing as $X$ and $Z$. 
 In the rest of this document, I show how arbitrary-length $Y$-chains can be accurately weighed, provided that the problem is generalised to a bilinear program. 
 \section{Weights}
-Bounding Box
+To derive the bilinear program, let's first show how the linear program for decoding syndromes independently is derived (see \cite{DKLP} for a longer and stronger explanation).
+We begin by writing the probability of an $X$ error that produces pairs of $X$ syndromes, according to an independent error model:
+\begin{equation}
+p(E_X) = \prod_{C_X \in E_X } p^{\abs{C_X}} (1-p)^{n-\abs{C_X}},
+\end{equation}
+where $E_X$ is the $X$ error, $C_X$ is a continuous chain of $X$s that makes up part of the error, and $n$ is the number of qubits.
+We can simplify this by taking the log: 
+\begin{flalign}
+p(E_X) &= (1-p)^n \prod_{C_X \in E_X } \left(\frac{p}{1-p} \right)^{\abs{C_X}}\\
+& \propto \sum_{C_X \in E_X} \log \left(\frac{p}{1-p} \right)\abs{C_X} \propto -\sum_{C_X \in E_X} \abs{C_X} 
+\end{flalign}
+Maximizing the likelihood, then, is equivalent to minimizing the sum of lengths of the chains $C_X$ whose endpoints are given by the $X$ (or equivalently $Z$) syndromes. 
+
+We can immediately see the problem. 
+A single $Y$ error has an effective weight of two, since it is detected as a length-one $X$ chain and a length-one $Z$ chain in the absence of other errors. 
+To fix this, let's consider a few examples. 
 \section{Optimisation Problem}
 \bibliographystyle{plain}
 \bibliography{BilinearProgramForSCDecoding}
