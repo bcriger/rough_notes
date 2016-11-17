@@ -130,7 +130,7 @@ Only if the two syndromes are collinear is there a unique path.}
 We'd prefer to have a solution that can handle $Y$ errors `out of the box', to try to put them on the same footing as $X$ and $Z$. 
 In the rest of this document, I loosely explore this kind of thing. 
 \section{Weights}
-To derive the bilinear program, let's first show how the linear program for decoding syndromes independently is derived (see \cite{DKLP} for a longer and stronger explanation).
+Let's first show how the linear program for decoding syndromes independently is derived (see \cite{DKLP} for a longer and stronger explanation).
 We begin by writing the probability of an $X$ error that produces pairs of $X$ syndromes, according to an independent error model:
 \begin{equation}
 p(E_X) = \prod_{C_X \in E_X } p^{\abs{C_X}} (1-p)^{n-\abs{C_X}},
@@ -175,6 +175,45 @@ In the crisp, clean picture of what these chains look like, we subtract one unit
 If all the chains intersected like this, we'd have a bilinear program on our hands. 
 In this world, we would just record which minimum-length paths intersect in one position with which others, and evaluate the cost by pricing the $X$ and $Z$ chains separately, then evaluating a matrix element which counts the number of intersections and subtract that off. 
 The first problem is that minimum-length paths which aren't straight can intersect in weird ways:
+\begin{figure}
+[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x/\y/\err in {5/2/$X$, 5/4/$Y$, 6/5/$Y$, 6/7/$Z$, 3/4/$Z$}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){\err};
+}
+\foreach \x/\y/\synd in {7/5/$X$, 2/4/$Z$, 5/1/$X$, 6/8/$Z$}{
+\node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
+}
+\end{tikzpicture}
+\caption{Bent $X$ and $Z$ paths that intersect on two qubits. Note that other minimum-length paths in the bounding boxes of these syndrome pairs can intersect on one or zero qubits.}
+\end{figure}
+This is in principle not a problem, since we can associate the maximum change in cost with any edge pair. 
+The real problem would be if a union of three paths ($a$, $b$, and $c$) had a cost that could not be described by a bilinear function. 
+\subsection{Cost Not Given By Bounding Box}
+We're still trying to attach a cost to a syndrome configuration, and it looks like you can obtain this for an $X$/$Z$ pair configuration by first getting the independent cost, then counting the number of qubits where the bounding boxes of the $X$/$Z$ syndrome intersect and subtracting.
+This works for the chain in Figure 6 (the bounding boxes of those syndrome pairs intersect on exactly two qubits), but it doesn't work for an arbitrary pair:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, loosely dotted, line cap=round, line join=round] (0,0) grid (10,10);
+\draw[step=2, line width = 2pt] (0,0) grid (9.99,9.99);
+\foreach \x/\y/\err in {4/5/$Z$, 5/4/$X$, 6/3/$X$, 5/6/$Y$, 4/7/$X$}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){\err};
+}
+\foreach \x/\y/\synd in {3/7/$X$, 6/6/$Z$, 4/4/$Z$, 7/3/$X$}{
+\node[fill=black] at (\x,\y){\textcolor{white}{\synd}};
+}
+\end{tikzpicture}
+\caption{Syndrome pairs that can't be priced by bounding box intersection. 
+The bounding box of the $Z$ pair is contained entirely in that of the $X$ pair, but the maximum intersection between these paths is one.}
+\end{figure}
+\FloatBarrier
+It is now no longer clear what the cost of a syndrome should be, let alone whether it can be represented by a bilinear function.
 \bibliographystyle{plain}
 \bibliography{BilinearProgramForSCDecoding}
 \section*{Appendices}
