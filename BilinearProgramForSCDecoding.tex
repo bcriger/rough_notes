@@ -221,4 +221,88 @@ It is now no longer clear what the cost of a syndrome should be, let alone wheth
 \section{Measuring a Different Code Every Round}
 If a bilinear program-based decoder doesn't work for whatever reason, do we have the option to measure a different set of stabilisers at every round that commute with the previous round's (e.g. CSS codes with $Y$ and $X$ strings instead of $X$ and $Z$) and reconstruct the error history from there?
 A program of research suggests itself, where we go back to DKLP and figure out which errors form chains in 3D given the cycle of stabilisers that we measure. 
+\section{Re-Re-weighting}
+Can we solve the problem with re-weighting where a geodesic error chain is chosen arbitrarily? 
+Maybe. 
+We can try to evaluate the conditional probability of an $X$ error on the qubit in a syndrome pair's bounding box, given that the syndrome pair is in the matching produced by the decoder. 
+We can even use message-passing to do this. 
+Considering the syndrome pair in Figure 4, we take the subgraph of the dual lattice that corresponds to the bounding box:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, line cap=round, line join=round] (0,0) grid (6,6);
+\end{tikzpicture}
+\end{figure}
+
+To ensure that we restrict to minimum-length paths, we add directions to each edge. 
+We then perform a forwards and backwards pass to obtain the probability that each vertex is involved in a path:
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, line cap=round, line join=round] (0,0) grid (6,6);
+\foreach \x in {0,2,4}{
+\foreach \y in {0,2,4,6}{
+\draw[line width = 2pt, line cap=round, line join=round, ->] (\x,\y) --++ (1,0);
+}
+}
+\foreach \x in {0,2,4,6}{
+\foreach \y in {2,4,6}{
+\draw[line width = 2pt, line cap=round, line join=round, ->] (\x,\y) --++ (0, -1);
+}
+}
+\end{tikzpicture}
+\hfill
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, line cap=round, line join=round] (0,0) grid (6,6);
+\foreach \x/\y/\num in {
+0/6/1, 2/6/1, 4/6/1, 6/6/1,
+0/4/1, 0/2/1, 0/0/1,
+2/4/2, 4/4/3, 6/4/4,
+2/2/3, 4/2/6, 6/2/10,
+2/0/4, 4/0/10, 6/0/20
+}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){$\num$};
+}
+\end{tikzpicture}
+\hfill
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, line cap=round, line join=round] (0,0) grid (6,6);
+\foreach \x/\y/\f in {
+0/6/1, 2/6/\frac{1}{2}, 4/6/\frac{1}{5}, 6/6/\frac{1}{20},
+0/4/\frac{1}{2}, 0/2/\frac{1}{5}, 0/0/\frac{1}{20},
+2/4/\frac{3}{5}, 4/4/\frac{9}{20}, 6/4/\frac{1}{5},
+2/2/\frac{9}{20}, 4/2/\frac{3}{5}, 6/2/\frac{1}{2},
+2/0/\frac{1}{5}, 4/0/\frac{1}{2}, 6/0/1
+}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){$\f$};
+}
+\end{tikzpicture}
+\caption{From left to right: Directions for which any valid path is minimum-length; number of paths from the top left to the highlighted vertex found by Pascal's triangle-type message-passing; probability of each vertex being involved in a randomly selected path.}
+\end{figure}
+
+The probability that an edge is involved in a given path is given as $p(e) = p(v_1,v_2) = p(v_1)p\left(v_2 \given v_1 \right)$, which we can evaluate by looking at subdiagrams of Figure 8:
+\begin{figure}
+\centering
+\begin{tikzpicture}[scale=0.75]
+\draw[step=2, line width = 2pt, line cap=round, line join=round] (0,0) grid (6,6);
+\foreach \x/\y/\f in {
+1/0/\frac{1}{20}, 3/0/\frac{1}{4}, 5/0/\frac{1}{2},
+0/1/\frac{1}{20}, 2/1/\frac{3}{20}, 4/1/\frac{3}{10}, 6/1/\frac{1}{2},
+1/2/\frac{3}{20}, 3/2/\frac{3}{10}, 5/2/\frac{3}{10},
+0/3/\frac{1}{5}, 2/3/\frac{3}{10}, 4/3/\frac{3}{10}, 6/3/\frac{1}{4},
+1/4/\frac{3}{10}, 3/4/\frac{3}{10}, 5/4/\frac{3}{20},
+0/5/\frac{1}{2}, 2/5/\frac{3}{10}, 4/5/\frac{3}{20}, 6/5/\frac{1}{20},
+1/6/\frac{1}{2}, 3/6/\frac{1}{5}, 5/6/\frac{1}{20}
+}{
+\fill[black] (\x,\y) circle(14pt);
+\node[white] at (\x,\y){$\f$};
+}
+\end{tikzpicture}
+\caption{Edge probabilities obtained by evaluating conditional probabilities on sub-diagrams of Figure 8.}
+\end{figure}
+\FloatBarrier
+Though this is a little messy, it looks like this might be a better way to re-weight the edges given that a path between the top left and bottom right corners exists. 
+If it isn't, I still suspect that it's related to some way to re-weight better.
 \end{document}
