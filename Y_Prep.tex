@@ -1,0 +1,74 @@
+% ##QuantumErrorCorrection ##LatticeSurgery ##StatePreparation
+\documentclass[a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{Quantum Fault Tolerance}
+\subtitle{$Y$-Eigenstate Preparation}
+\author{Ben Criger}
+\date{\today}
+\input{Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+
+\providecommand{\cnot}{\textsc{cnot}}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+People always act like fault-tolerant state preparation by measurement is limited to the $X$ or $Z$ eigenstates. 
+This implies that, in order to prepare a $Y$ eigenstate, we have to use state distillation. 
+Let's confirm that this is the case by attempting some na\"{i}ve measurement-based preparation and showing that it doesn't work. 
+\section{Surface Code}
+We begin with nine qubits in $Y$ eigenstates.
+The checks to be measured are:
+\begin{equation}
+X_{01},\,\,X_{1245},\,\,X_{3467},\,\,X_{78},\,\,Z_{25},\,\,Z_{4578},\,\,Z_{0134},\,\,Z_{36}
+\end{equation}
+We measure in the $X$/$Z$ boundary operators first:
+\begin{flalign}
+S &\mapsto \group{Y_4,\,(-1)^{x_{01}}X_{01}, \, Y_{01}
+,\,(-1)^{x_{78}}X_{78}, \, Y_{78}
+,\,(-1)^{z_{25}}Z_{25}, \, Y_{25}
+,\,(-1)^{z_{36}}Z_{36}, \, Y_{36}} \\
+&\underset{M_{X_{1245}}}{\mapsto} \group{(-1)^{x_{1245}}X_{1245},\, Y_{014},\,(-1)^{x_{01}}X_{01}, \, 
+(-1)^{x_{78}}X_{78}, \, Y_{78}
+,\,(-1)^{z_{25}}Z_{25}, \, Y_{25}
+,\,(-1)^{z_{36}}Z_{36}, \, Y_{36}} \\
+&\underset{M_{X_{3467}}}{\mapsto} \left \langle (-1)^{x_{1245}}X_{1245},\, (-1)^{x_{3467}}X_{3467},\, (-1)^{x_{01}}X_{01},\, 
+(-1)^{x_{78}}X_{78}
+,\,(-1)^{z_{25}}Z_{25},\,(-1)^{z_{36}}Z_{36}, \right. \nonumber \\
+&\qquad \qquad \left. Y_{01478}, \, Y_{25}
+,\, Y_{36} \right \rangle \\
+& \underset{M_{Z_{0134}}}{\mapsto} \left \langle (-1)^{x_{1245}}X_{1245},\,
+(-1)^{z_{0134}}Z_{0134},\,
+(-1)^{x_{3467}}X_{3467},\, (-1)^{x_{01}}X_{01},\, 
+(-1)^{x_{78}}X_{78}
+,\,(-1)^{z_{25}}Z_{25},\,(-1)^{z_{36}}Z_{36}, \right. \nonumber \\
+&\qquad \qquad \left. Y_{0134678}, \, Y_{25} \right \rangle
+\end{flalign}
+Under the last stabiliser measurement, this maps to a joint eigenstate of the surface code stabilisers and a transversal $Y$ operator. 
+This transversal operator is a logical $Y$ for any odd-distance surface code, since it is the product of an odd number of $Z$ columns and an odd number of $X$ rows. 
+\section{Open Question}
+Have I done this wrong?
+Is there a hiccup when we attempt $d$ rounds of the above measurement?
+\end{document}
