@@ -68,7 +68,19 @@ S &\mapsto \group{Y_4,\,(-1)^{x_{01}}X_{01}, \, Y_{01}
 \end{flalign}
 Under the last stabiliser measurement, this maps to a joint eigenstate of the surface code stabilisers and a transversal $Y$ operator. 
 This transversal operator is a logical $Y$ for any odd-distance surface code, since it is the product of an odd number of $Z$ columns and an odd number of $X$ rows. 
+
+To correct for random measurement results, we have to find an even-weight $X$/$Z$ Pauli for every $-1$ syndrome, so that it will commute with the transversal $Y$.
+This is always possible, since the distance is odd, so one of the $X$/$Z$ boundaries will be an even distance away from any given syndrome.
+The catch is when you have to also correct a data error, which we go over in the next  section.
+
+\section{Data Errors}
+When we prepare an $X$ or $Z$ eigenstate, one type of stabiliser gives completely random results. 
+This is tolerated, since the type of data error that the randomized stabiliser would detect is the same as the prepared basis state used at the beginning. 
+For example, if preparing an $X$ eigenstate, we don't care about $X$ errors that occur on the data, since we begin in a $\ket{+}$ state on every qubit.
+$Z$ errors are faithfully detected by the non-randomised stabilisers, and we can correct them. 
+This is not the case when preparing a $Y$ eigenstate, since both sets of stabilisers give random results. 
 \section{Open Question}
-Have I done this wrong?
-Is there a hiccup when we attempt $d$ rounds of the above measurement?
+There are relatives of the surface code that have $Y$/$Z$ or $Y$/$X$ stabilisers instead of $X$/$Z$.
+Some of the old and new stabilisers will anti-commute if we measure one code at one round and another code the next. 
+Are these codes still useful?
 \end{document}
