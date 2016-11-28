@@ -1,0 +1,61 @@
+% ##QuantumErrorCorrection ##SyndromeMeasurement
+\documentclass[a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{Quantum Fault Tolerance}
+\subtitle{Measuring Small Stabilisers onto Bare Ancillas}
+\author{Ben Criger}
+\date{\today}
+\input{Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+\setlength{\parskip}{1em}
+\providecommand{\cnot}{\textsc{cnot}}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+The toric/surface code is typically defined with weight-4 stabilisers of the form $XXXX$ and $ZZZZ$. 
+This code detects $X$ and $Z$ errors independently, which can be a problem if the $Y$ error rate is large (which is the case if the code is actually detecting amplitude damping), or if the $X$ and $Z$ error rates are different, potentially leading to different logical error rates (though the gates involved in syndrome measurement may `un-bias' the noise for you). 
+To remedy this, we can take advantage of the fact that any set of stabilisers which differs from the surface code stabilisers by a transversal unitary, which we will restrict to be a Clifford (though I don't think it has to be a Clifford, in principle).
+
+There are two popular modifications, one which exchanges $ZZZZ$ stabilisers for $YYYY$ stabilisers, and one which acts a Hadamard on half the qubits, resulting in stabilisers of the form $XZZX$ and $XZXZ$.
+We might even combine these to obtain $XYYX$/$XYXY$ stabilisers, if $X$/$Y$ error rates differ, or if it offers some advantage in terms of the independent $Z$ error rate that's on due to dephasing. 
+The question we address in this document is how to measure these operators onto a bare ancilla. 
+We apply a general principle, that stabiliser measurement is equivalent to phase estimation, except that we know the phase is $\pm 1$ in advance.
+The syndrome measurement circuit is therefore: 
+\begin{figure}[!h]
+\centering
+\input{BigControlledPauli.tikz}
+\caption{Stabiliser measurement circuit for whatever weight-4 stabiliser.}
+\end{figure}
+
+Using circuit identities, we can express this circuit using the experimentally available gate set.
+This is the origin of the $Y_{90}$/\textsc{cphase}-based implementations we often use in superconducting qubits. 
+Let's try the same thing with the operators $YYYY$ and $XXYY$:
+
+\section{Open Questions}
+\begin{itemize}
+\item Can you prepare a nice state using codes that differ from the toric/surface code by a transversal (perhaps non-Clifford) unitary?
+\end{itemize}
+\end{document}
