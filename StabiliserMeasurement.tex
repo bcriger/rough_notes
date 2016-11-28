@@ -52,8 +52,42 @@ The syndrome measurement circuit is therefore:
 
 Using circuit identities, we can express this circuit using the experimentally available gate set.
 This is the origin of the $Y_{90}$/\textsc{cphase}-based implementations we often use in superconducting qubits. 
-Let's try the same thing with the operators $YYYY$ and $XXYY$:
-
+The circuit identities used in this case are simple, decomposing the Pauli $X$ into $Y_{90} Z Y_{-90}$:
+\begin{flalign}
+& \begin{bmatrix}
+\nicefrac{1}{\sqrt{2}} & -\nicefrac{1}{\sqrt{2}} \\ \nicefrac{1}{\sqrt{2}} & \nicefrac{1}{\sqrt{2}}
+\end{bmatrix} 
+\begin{bmatrix}
+1 & 0 \\ 0 & -1
+\end{bmatrix} 
+\begin{bmatrix}
+\nicefrac{1}{\sqrt{2}} & \nicefrac{1}{\sqrt{2}} \\ -\nicefrac{1}{\sqrt{2}} & \nicefrac{1}{\sqrt{2}}
+\end{bmatrix} \\ 
+&= \frac{1}{2} \begin{bmatrix}
+1 & -1 \\ 1 & 1
+\end{bmatrix}\begin{bmatrix}
+1 & 1 \\ 1 & -1
+\end{bmatrix} = X
+\end{flalign}
+We can show the same thing with the operator $Y = X_{-90} Z X_{90}$:
+\begin{flalign}
+& \dfrac{1}{2} \begin{bmatrix}
+1 & i \\ i & 1
+\end{bmatrix} 
+\begin{bmatrix}
+1 & 0 \\ 0 & -1
+\end{bmatrix} 
+\begin{bmatrix}
+1 & -i \\ -i & 1
+\end{bmatrix} \\ 
+&= \frac{1}{2} \begin{bmatrix}
+1 & i \\ i & 1
+\end{bmatrix}\begin{bmatrix}
+1 & -i \\ i & -1
+\end{bmatrix} = Y
+\end{flalign}
+To measure one of these stabilisers, then, all you have to do is replace the $Y_{90}$ rounds used for $X$ measurement with some $X_{90}$s.
+Measuring multiple stabilisers at a time might be tricky, but that's a topic for another note. 
 \section{Open Questions}
 \begin{itemize}
 \item Can you prepare a nice state using codes that differ from the toric/surface code by a transversal (perhaps non-Clifford) unitary?
