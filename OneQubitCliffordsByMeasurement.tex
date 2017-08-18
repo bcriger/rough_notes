@@ -30,8 +30,6 @@
 \setlength\figureheight{7cm}
 \setlength\figurewidth{12cm}
 
-\providecommand{\cnot}{\textsc{cnot}}
-
 \usetikzlibrary{decorations.pathreplacing, decorations.pathmorphing, shapes.geometric, calc}
 
 \providecommand{\protocol}[4]{
@@ -169,10 +167,10 @@ Below, I present the 18 protocols, with a little equation explaining what happen
 \protblob{Z}{Y}{X}{Y}{XZ}{ZZ}{ZI}{XI}{H}%17
 \protblob{Z}{Y}{Y}{X}{XZ}{ZZ}{ZI}{XI}{H}%18
 
-\section{Implementation}
-Let's begin with trying $H$, $P$, and $HPH$ on a 5-qubit code. 
-
-
+\section{Comments}
+It looks like each code involved in the gate must be distance 3. 
+This is because one logical operator from each of the initial codes remains in the logical group of the intermediate code. 
+If using a destructive measurement at the end, you could settle for having a single weight-2 logical, but there are no codes with two large logicals and one small (at least small ones with $k=1$).
 \section{Two-Qubit Cliffords}
 It would be interesting to generalise this to two-qubit Cliffords (\cnot{}s, \cz{}s, and shallow compiled gates), but there are a too many possible circuits for me to spam them all.
 \end{document}
