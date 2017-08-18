@@ -8,6 +8,7 @@
 \usepackage{xspace}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclareMathOperator{\Span}{span}
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \providecommand{\polygon}[2]{%
@@ -23,12 +24,13 @@
   \makebox[0pt][l]{\usebox\CBox}%  
   \rule[0.5\ht\CBox-#1/2]{\wd\CBox}{#1}}
 
-\providecommand{\drv}[1]{\dfrac{\partial }{\partial #1}}
-\providecommand{\drf}[2]{\dfrac{\partial #1}{\partial #2}}
-\providecommand{\ddrf}[3]{\dfrac{\partial^2 #1}{\partial #2 \partial #3}}
+\providecommand{\drv}[1]{\frac{\partial }{\partial #1}}
+\providecommand{\drf}[2]{\frac{\partial #1}{\partial #2}}
+\providecommand{\ddrf}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\providecommand{\ddid}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3} = \dfrac{\partial^2 #1}{\partial #3 \partial #2}}
 
 \providecommand{\tr}{\mathrm{tr}}
-
+ 
 \providecommand{\ket}[1]{\left \vert #1 \right \rangle}
 \providecommand{\bra}[1]{\left \langle #1 \right \vert}
 \providecommand{\braket}[2]{\left \langle #1 \left \vert #2 \right. \right \rangle}
@@ -62,22 +64,27 @@
 \providecommand{\comp}{\mathop{\bigcirc}}
 \providecommand{\swap}{\textsc{swap}\xspace}
 \providecommand{\cnot}{\textsc{cnot}\xspace}
+\providecommand{\cz}{\textsc{cz}\xspace}
 \providecommand{\col}{\textrm{col}}
 \providecommand{\qec}[3]{\llbracket #1,\,#2,\,#3 \rrbracket}
 \providecommand{\set}[1]{\left \lbrace #1 \right \rbrace}
 \renewcommand{\Im}{\textrm{Im}}
 \renewcommand{\Re}{\textrm{Re}}
 \providecommand{\lind}{\mathcal{L}}
-\providecommand{\norm}[2]{\left \vert \left \vert #2 \right \vert \right \vert_{#1}}
+%\providecommand{\norm}[2]{\left \vert \left \vert #2 \right \vert \right \vert_{#1}}
 \providecommand{\supp}[1]{\mathrm{supp}\left( #1 \right)}
 \providecommand{\given}{\, \middle \vert \,}
 \providecommand{\suchthat}{\, \middle \vert \,}
 \providecommand{\diag}[1]{\mathrm{diag}\left( #1 \right)}
 \providecommand{\ct}{^{\dagger}}
 
-\providecommand{\norm}[1]{\left\Vert #1 \right\Vert} %only works with amsmath
+\providecommand{\norm}[1]{\left \Vert #1 \right \Vert} %only works with amsmath
 
 \providecommand{\ncrit}{$n_{\textrm{crit}}$\xspace}
+
+\renewcommand{\th}{\textrm{th}}
+\newcommand{\prob}[1]{p\left(#1 \right)}
+\newcommand{\cprob}[2]{p\left(#1\,\left\vert\vphantom{#1#2}\right. #2\right)}
 
 \makeatletter
 \providecommand{\pr}[2]{p\left(#1\,\middle|\,#2\right)}
