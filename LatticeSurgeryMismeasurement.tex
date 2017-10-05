@@ -1,0 +1,73 @@
+% ##LatticeSurgery
+\documentclass[a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{Lattice Surgery}
+\subtitle{Effect of Mismeasurement}
+\author{Ben Criger}
+\date{\today}
+\input{../../../Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+
+\providecommand{\cnot}{\textsc{cnot}}
+
+\usetikzlibrary{decorations.pathreplacing,decorations.pathmorphing}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+There's an argument floating around that a certain lattice surgery technique won't be fault-tolerant, which I heard from Christophe Vuillot, who (I think) heard it from Earl Campbell. 
+I've since seen the technique pop up in other places, so I figure I'd summarise the argument here. 
+\section{High-Weight Operators and Mismeasurement}
+The technique we're going to discuss is the direct measurement of high-weight operators in lattice surgery (here, `high' means greater than 2). 
+The objection will be clear if we just discuss a weight-3 example at two different distances, so I'll begin at distance 3.
+\begin{figure}[!ht]
+\centering
+\input{xxx_meas.tikz}
+\caption{Distance-3 layout for measuring $\overline{X}^{\otimes 3}$ through lattice surgery. 
+Merge operators are drawn semi-transparently, the operator drawn in blue is the \emph{central operator}, to be discussed shortly.}
+\end{figure}
+
+If all goes well, we should be able to merge and split in order to learn the eigenvalue of the operator $\overline{X} \overline{X} \overline{X}$, but what if we don't measure the central operator correctly? 
+Specifically, what if we accidentally measure a weight-2 `ear' operator? 
+Then, we would have a situtation where the measurement is telling us about $\overline{X} \overline{X}$ instead of the weight-3 $\overline{X} \overline{X} \overline{X}$, which is a logical failure mode not present in the weight-2 logical measurement. 
+
+\newpage
+The real bad news, though, comes when we discuss how this changes with distance. 
+Consider the distance-5 case:
+\begin{figure}[!ht]
+\centering
+\input{dist_5_xxx_meas.tikz}
+\caption{Distance-5 layout for measuring $\overline{X}^{\otimes 3}$ through lattice surgery. 
+The central operator is unchanged by the increase in distance.}
+\end{figure}
+
+The central operator is in the same place as before, at the same size. 
+Thus, the same mismeasurement as before produces the same logical error as before, with no increase in weight.
+This implies that the technique is not fault-tolerant. 
+
+\section{Open Questions}
+In reality, we need to repeat the measurement $O(d)$ times in order to infer the eigenvalue of a logical operator with accuracy. 
+Does this imply that we'd have to mismeasure the central operator $O(d)$ times in order to actually realise the logical failure imagined above? 
+\end{document} 
