@@ -1,0 +1,103 @@
+% ##StateInjection ##MagicStates ##SurfaceCode
+\documentclass[a4paper, english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage[cm]{fullpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{placeins}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\definecolor{gr}{gray}{0.9}
+\renewcommand{\familydefault}{\sfdefault}
+\title{State Injection}
+\subtitle{Injecting into Rotated Surface Codes from the Corner}
+\author{Ben Criger}
+\date{\today}
+\input{../../../Qcircuit.tex}
+\input{bencommands.tex}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
+
+\providecommand{\cnot}{\textsc{cnot}}
+
+\usetikzlibrary{decorations.pathreplacing,decorations.pathmorphing}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+I'm interested to replicate (or at least understand) the work of Ying Li in high-fidelity state injection in surface codes.
+Namely, I'd like to realise it in rotated surface codes, which use fewer data qubits. 
+This document details an attempt to do so, which may or may not pan out. 
+The key detail is that Ying Li puts the magic state on the corner, and so avoids having lots of random stabilisers nearby. 
+I'd like to see if we can pull off the same trick. 
+\section{$ZX$-Calculus Snippet}
+We can express state distillation as a type of state transfer or teleportation (which are equivalent in the $ZX$-calculus):
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.2\textwidth]{zx_state_injection.pdf}
+\caption{A variation on the state transfer protocol from section 3.3.2 of Coecke/Duncan. 
+We begin with an arbitrary state $\ket{\psi}$ and a $\overline{\ket{+}}$, then merge by projecting into the $+1$-eigenspace of $Z \otimes \bar{Z}$. 
+The resulting state is $\overline{\ket{\psi}}$.}
+\end{figure}
+
+The task now is to find a code for which there's a weight-3 $\bar{Z}$ that goes around a corner. 
+Here's one:
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{corner_code.pdf}
+\caption{A code with the right $\bar{Z}$ in the right place.}
+\end{figure}
+
+The $\bar{X}$ operators are all weight-two, which lets us break the $\overline{\ket{+}}$ into two Bell pairs and a 4-CAT:
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{injection_initial_state.pdf}
+\caption{The initial and final stabilisers for the deformation I'm going to try.}
+\end{figure}
+\FloatBarrier
+In case it's unclear, here's the deformation from initial to final stabilisers/logicals:
+\begin{flalign}
+S_{\textrm{init}} &= \left \langle
+X_{12} ,\, X_{36} ,\, X_{45} ,\, X_{47} ,\, X_{58}
+\right. \nonumber \\
+& \phantom{=} \left. Z_{12} ,\, Z_{36} ,\, Z_{4578} \right \rangle \nonumber \\ 
+L_{\textrm{init}} &= \group{X_0 ,\, Z_0}
+\end{flalign}
+I'm going to label the new stabilisers/logicals by which new operator I measure:
+\begin{flalign}
+S_{Z_{0134}} &= \left \langle
+X_{1245} ,\, X_{3467} ,\, X_{58} ,\, X_{3456}
+\right. \nonumber \\
+& \phantom{=} \left. Z_{12} ,\, Z_{36} ,\, Z_{4578} ,\, Z_{0134} \right \rangle \nonumber \\ 
+L_{Z_{0134}} &= \group{X_{012} ,\, Z_0} \\ %%%%%%%%%%
+S_{Z_{67}} &= \left \langle
+X_{1245} ,\, X_{3467} ,\, X_{58}
+\right. \nonumber \\
+& \phantom{=} \left. Z_{12} ,\, Z_{36} ,\, Z_{4578} ,\, Z_{0134} ,\, Z_{67} \right \rangle \nonumber \\ 
+L_{Z_{67}} &= \group{X_{012} ,\, Z_0} \\ %%%%%%%%%%
+S_{X_{03}} &= \left \langle
+X_{1245} ,\, X_{3467} ,\, X_{58} ,\, X_{03}
+\right. \nonumber \\
+& \phantom{=} \left. Z_{12} ,\, Z_{4578} ,\, Z_{0134} ,\, Z_{67} \right \rangle \nonumber \\ 
+L_{X_{03}} &= \group{X_{012} ,\, Z_{036}} %%%%%%%%%%
+\end{flalign}
+\section{Open Questions}
+\begin{itemize}
+\item Can this be made fault-tolerant?
+\item What happens if we express state transfer as a bigger merge between multiple codes? 
+\item How about we express a unitary encoder for the surface code in the $ZX$-calculus and translate it into a series of measurements?
+\item How do we order and repeat measurements to post-select?
+\end{itemize}
+\end{document} 
