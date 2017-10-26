@@ -93,6 +93,27 @@ X_{1245} ,\, X_{3467} ,\, X_{58} ,\, X_{03}
 & \phantom{=} \left. Z_{12} ,\, Z_{4578} ,\, Z_{0134} ,\, Z_{67} \right \rangle \nonumber \\ 
 L_{X_{03}} &= \group{X_{012} ,\, Z_{036}} %%%%%%%%%%
 \end{flalign}
+
+\section{Split-Based State Preparation}
+We can write state preparation of $Z_{\alpha}\ket{+}$ as a $\bar{Z}$-split based operation:
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.5\textwidth]{split_state_prep.pdf}
+\caption{The preparation of $Z_{\alpha}\ket{+}$ from a single qubit initialised in the $\ket{+}$ or $\ket{0}$ states, by performing the appropriate split ($Z$ or $X$, respectively), applying the rotation $Z_{\alpha}$ on one of the split codes and projecting it onto $\ket{+}$.}
+\end{figure}
+
+The repetition code has a weight-one logical, therefore it allows arbitrary transversal rotations about that logical. 
+We can also obtain the repetition code by splitting from a surface code:
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.4\textwidth]{split_repetition_code.pdf}
+\end{figure}
+\caption{How to split a repetition code off from a surface code.}
+\FloatBarrier
+After this, we'd have to measure the $\bar{X}$ of the repetition code, which is not ideal, since we can't decode by reconstructing the stabilisers from measurement results. 
+However, this may give us a way to prepare magic states that depends only on single-qubit and measurement operations.
+
+It may also be interesting to prepare Bell pairs between small and large surface codes, so that we can perform a circuit on one of them and end up with the state injected at a large distance. 
 \section{Open Questions}
 \begin{itemize}
 \item Can this be made fault-tolerant?
